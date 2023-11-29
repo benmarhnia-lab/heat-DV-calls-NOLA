@@ -1,6 +1,7 @@
 # Load packages ----
 library(tidyverse)
 library(fst)
+library(janitor)
 
 # Read data
 rm(list = ls())
@@ -37,28 +38,14 @@ df_missing_zip$long <- as.numeric(sapply(coordinates, function(x) x[2]))
 df_latlong_unusable <- df_missing_zip |>
     filter(long > -89.7891)
 
+## Number of cases where lat long is usable
+df_latlong_usable <- df_missing_zip |>
+    filter(!uid %in% df_latlong_unusable$uid)
 
-# Export this to an excel for Namratha and Grace
-write.csv(df_latlong_unusable, "D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/outputs/latlong_unusable.csv", row.names = FALSE)
+## Check
+nrow(df_latlong_unusable) + nrow(df_latlong_usable) == nrow(df_missing_zip)
 
-# Convert lat and long to zip code
-library(ggmap)
-20000/4/60
-# Create an empty vector to store zip codes
-zip_codes <- character(nrow(df_missing_zip))
-
-# Loop through the rows and find zip codes
-# Loop through the rows and find zip codes
-for (i in 1:nrow(df_missing_zip)) {
-  result <- revgeocode(c(df_missing_zip$long[i], df_missing_zip$lat[i]), output = "address")
-  if (!is.null(result)) {
-    # Extract the zip code from the address
-    zip_code <- sub('.*, ([0-9]{5}),.*', '\\1', result)
-    zip_codes[i] <- zip_code
-  } else {
-    zip_codes[i] <- NA
-  }
-}
-ggmap::register_google()
-# Add the zip code column to the data frame
-df$zip_code <- zip_codes
+# Save your work
+## Export this to an excel for Namratha and Grace
+# write.csv(df_latlong_unusable, "D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/outputs/latlong_unusable.csv", row.names = FALSE)
+write_fst(df_latlong_usable, path = "D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/nopd_calls_zip_missing_w_latlong.fst")
