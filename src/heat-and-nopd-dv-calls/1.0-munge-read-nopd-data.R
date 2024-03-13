@@ -33,7 +33,7 @@ combined_df <- combined_df %>%
     dplyr::select(uid, everything())
 
 # Save work
-write_fst(combined_df, "D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/1.0-nopd_calls_comb_raw.fst")
+write_fst(combined_df, "D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/heat-and-nopd-dv-calls/1.0-nopd-calls-raw-all.fst")
 nrow(combined_df)
 
 # Subset data to retain DV cases only
@@ -52,7 +52,7 @@ df_nopd_dv_cases <- combined_df |>
 nrow(df_nopd_dv_cases)
 
 # Save Work
-write_fst(df_nopd_dv_cases, "D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/1.0-dv_cases_only.fst")
+write_fst(df_nopd_dv_cases, "D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/heat-and-nopd-dv-calls/1.0-nopd-calls-raw-dv-only.fst")
 
 #############################################
 # Create a unique list of TypeText
@@ -60,4 +60,5 @@ type_text <- sort(unique(combined_df$TypeText))
 type_text <- as.data.frame(type_text)
 nrow(type_text)
 # Save outputs
-write.xlsx(type_text, "D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/nopd_call_type_categories.xlsx", sheetName = "call_type_categories")
+write.xlsx(type_text, "D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/heat-and-nopd-dv-calls/1.0-nopd-call-type-categories.xlsx", 
+            sheetName = "call_type_categories")

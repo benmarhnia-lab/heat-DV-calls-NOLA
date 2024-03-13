@@ -1,20 +1,14 @@
 # Load packages ----
-rm(list = ls())
-library(tidyverse)
-library(data.table)
-library(fst)
-
+pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed)
 
 # Read NOPD-DV cases ---- 
-df_nopd_dv_cases <- read_fst("D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/dv_cases.fst",
+rm(list = ls())
+df_nopd_dv_cases <- read_fst("D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/heat-and-nopd-dv-calls/1.2-nopd-calls-raw-dv-only-completed.fst",
                               as.data.table = TRUE)
 nrow(df_nopd_dv_cases)
 colnames(df_nopd_dv_cases)
 
-### Remove rows with missing Zip 
-df_dv_cases_valid <- df_nopd_dv_cases[(!is.na(Zip) & Zip != "None" & Zip != ""),]
-
-# nrow(df_dv_cases_valid)
+tabyl(df_nopd_dv_cases$Zip)
 
 # Create a variables for date ---- 
 df_dv_cases_valid <- df_dv_cases_valid[, ':=' (
