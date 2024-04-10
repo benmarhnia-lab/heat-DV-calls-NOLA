@@ -1,10 +1,13 @@
+# This script identifies cases with missing zip codes and exports them to an excel file for Namratha and Edwin to fill in. The filled data is then merged with the main data in the next script.
+# Do not need to run this code again. Namratha and Edwin have processed the files manually outside this project.
+
 # Load packages ----
-pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed)
+pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
+rm(list = ls())
 
 # Read raw-dv data
-rm(list = ls())
-df_nopd_dv_cases <- read_fst("D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/heat-and-nopd-dv-calls/1.0-nopd-calls-raw-dv-only.fst", 
-                                as.data.table = TRUE)
+path_processed_data <- here("data", "processed-data")
+df_nopd_dv_cases <- read_fst(here(path_processed_data, "1.1a-nopd-calls-raw-dv-only.fst"), as.data.table = TRUE)
 nrow(df_nopd_dv_cases) # 167,042 cases
 
 # Subset of data where zip code is missing
@@ -30,5 +33,5 @@ nrow(df_missing_zip_and_block) # There is no such case!
 
 # Save files
 ## Export missing Zip files to an excel for Namratha and Edwin to fill in
-write.csv(df_missing_zip, "D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/heat-and-nopd-dv-calls/1.1-missing-zips.csv", row.names = FALSE)
+write.csv(df_missing_zip, here(path_processed_data, "1.1b-missing-zips.csv", row.names = FALSE))
 

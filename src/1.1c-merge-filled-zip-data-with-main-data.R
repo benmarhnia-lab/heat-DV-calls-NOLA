@@ -1,11 +1,14 @@
+# This script merges the filled zip data with the main data. 
+# The filled data was provided by Edwin and Namratha.
+
 # Load packages ----
-pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed)
+pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
+rm(list = ls())
 
 # Read data
-rm(list = ls())
 ## Read raw-dv data
-df_nopd_dv_cases_all <- read_fst("D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/heat-and-nopd-dv-calls/1.0-nopd-calls-raw-dv-only.fst", 
-                                as.data.table = TRUE)
+path_processed_data <- here("data", "processed-data")
+df_nopd_dv_cases_all <- read_fst(here(path_processed_data, "1.1a-nopd-calls-raw-dv-only.fst"), as.data.table = TRUE)
 nrow(df_nopd_dv_cases_all) # 167,042 cases
 
 ### Subset of data where zip code is missing
@@ -19,7 +22,7 @@ nrow(df_complete_zip)
 nrow(df_nopd_dv_cases_all) - nrow(df_missing_zip) 
 
 ## Read filled zip data ----
-df_filled_zip_edwin_namratha <- read.csv("D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/heat-and-nopd-dv-calls/nopd-missing-zips-filled.csv", stringsAsFactors = FALSE)
+df_filled_zip_edwin_namratha <- read.csv(here("data", "raw-data", "nopd-missing-zips-filled-by-Edwin-Namratha.csv"), stringsAsFactors = FALSE)
 nrow(df_filled_zip_edwin_namratha)
 df_filled_zip_edwin_namratha <- df_filled_zip_edwin_namratha |> select(uid, Zip)
 length(unique(df_filled_zip_edwin_namratha$uid))
@@ -27,9 +30,9 @@ length(unique(df_filled_zip_edwin_namratha$uid))
 # Perform the merge ----
 
 ## First complete the zip column in the filled data ----
-colnames(df_missing_zip_new)
 df_missing_zip_new <- df_missing_zip |> select(-Zip)
 df_missing_zip_new <- df_missing_zip_new |> left_join(df_filled_zip_edwin_namratha, by = "uid")
+colnames(df_missing_zip_new)
 
 sum(is.na(df_missing_zip_new$Zip))
 
@@ -46,4 +49,5 @@ nrow(df_complete_zip)
 nrow(df_missing_zip_new)
 
 ## Save the data ----
-write_fst(df_nopd_dv_cases_full, "D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/heat-and-nopd-dv-calls/1.2-nopd-calls-raw-dv-only-completed.fst")
+write_fst(df_nopd_dv_cases_full, 
+    here(path_processed_data, "1.1c-nopd-calls-raw-dv-only-completed.fst"))
