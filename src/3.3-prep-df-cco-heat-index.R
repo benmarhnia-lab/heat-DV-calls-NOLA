@@ -7,7 +7,7 @@ path_processed <- here("data", "processed-data")
 
 # Read data ----
 ## Climate data ----- 
-df_climate_tmax <- read_fst(here(path_processed, "2.4-clim-vars-wbgt.fst"), as.data.table = TRUE)
+df_climate_tmax <- read_fst(here(path_processed, "2.6-clim-vars-heat-index.fst"), as.data.table = TRUE)
 ## NOPD - DV calls data -----
 df_dv_agg <- read_fst(here(path_processed, "1.4-DV-cases-agg.fst"), as.data.table = TRUE)
 
@@ -27,7 +27,7 @@ df_nopd_tmax_merged <- df_nopd_tmax_merged |>
   )
 
 # Check the data -------
-# View((df_nopd_tmax_merged |> filter(Zip == 70117) |> select(dv_case, Zip, date, case_date, year, month, weekday, wbgt_max)))
+View((df_nopd_tmax_merged |> filter(Zip == 70117) |> select(dv_case, Zip, date, case_date, year, month, weekday, heat_index)))
 
 ## Inspect missing temperature cases
 nrow(df_nopd_tmax_merged) # 264,338
@@ -35,5 +35,5 @@ sum(is.na(df_nopd_tmax_merged$tmax)) # 0 cases
 
 
 # Save the data ----
-write_fst(df_nopd_tmax_merged, here(path_processed, "3.2-cco-data-wbgt.fst"))
+write_fst(df_nopd_tmax_merged, here(path_processed, "3.3-cco-data-heat-index.fst"))
 

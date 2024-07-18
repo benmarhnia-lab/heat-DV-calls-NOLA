@@ -1,144 +1,83 @@
-rm(list = ls())
-pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
-library(survival)
-
-# Read Data ----
-# Read data ----
-path_processed <- here("data", "processed-data")
-df_cco_wbgt <- read_fst(here(path_processed, "4.1-a-cco-data-wbgt.fst"), as.data.table = TRUE)
-df_cco_tmax <- read_fst(here(path_processed, "4.1-b-cco-data-tmax.fst"), as.data.table = TRUE)
-
-colnames(df_nopd_climate_merged)
-tabyl(df_nopd_climate_merged, dv_case)
-
-# Conditional Logit Model ----
-## WBGT
-df_nopd_climate_merged2 <- df_nopd_climate_merged |> 
-  filter(year > 2014 & year < 2023)
-
-View(df_nopd_climate_merged2)
-
-model_1 <- clogit(dv_case ~ hw_97_wb_2d + strata(ID_grp), 
-                  weights = DV_count,
-                  data=df_cco_wbgt, 
-                  method="approximate")
-summary(model_1)
-
-## Tmax
-model_2 <- clogit(dv_case ~ hw_33_db_5d + strata(ID_grp), 
-                  weights = DV_count,
-                  data=df_cco_tmax, 
-                  method="approximate")
-# head(df_cco_tmax$dv_case)
-summary(model_2)
-## Old codes
-
-## Dataset preparation-uploading data
-Example dataset is time series dataset in which each day and municipality is a row includes the number of hospitalizations and whether or not that day was a heat wave. The dataset includes every day from January 1st 2008 to December 31st, 2018. If there was no hospitalization in a municipality on any given day, it will be listed as 0. If there was a heatwave, hw = 1, and if no heatwave, hw = 0. First, in order to change our dataset to case-crossover format, we will need to create a variable for weekday, month, year, week and day. We will then separate our data into an exposure dataset and a outcome dataset. A new date variable called case_date is created and kept only in the outcome dataset to differentiate between the exposure date and case date.
-
-```{r}
-Baja_data <- read.csv("../data/BC_hosp_temp_08_18_clean.csv")
-
-Baja_data$wday<-wday(Baja_data$date)
-Baja_data$month<-month(Baja_data$date)
-Baja_data$year<-year(Baja_data$date)
-Baja_data$week<-week(Baja_data$date)
-Baja_data$day<-format(as.Date(Baja_data$date,format="%Y-%m-%d"), "%d")
-
-Baja_data$date<- as.numeric(as.character(as.Date(Baja_data$date, format = "%Y-%m-%d"), format="%Y%m%d"))
-Baja_data$case_date<- Baja_data$date
-
-Baja_hosp = subset(Baja_data, select = c("munic", "case_date", "adm2_es", "month", "year", "day", "wday", "all_hosp")     ) 
-Baja_temp = subset(Baja_data, select = c("munic", "date", "month", "year", "wday", "max_temp_era5", "min_temp_era5", "hw")     ) 
+rm(list =ls())
+options(scipen=999)
+options(digits=5)
+pacman::p_load(tidyverse, ggpubr, ggplot2, sjPlot, readxl, here, extrafont, ggbreak, patchwork)
 
 
-```
-## Let's take a quick look at our data format and exposure over time
-```{r}
-head(Baja_hosp)
+# font_import() # run only once
+# loadfonts(device="win") # run only once
 
-Baja_temp %>% 
-  group_by(month, munic) %>% 
-  summarise(hw_by_month = sum(hw))
-```
+# Load data ----
+here_output_files <- here("outputs", "models", "models-cco-tmax")
+df_full_models <- read.csv(here(here_output_files, "models_consolidated_cco-tmax.csv"))
+dim(df_full_models)
 
-## Preparing outcome dataset
-# We can delete any missing data as any row which does not have any hospitalization as this day will not be considered in our analysis. 
-# We will also need a unique identifier for each row which will represent each case-control combination in our final dataset. 
-```{r}
-Baja_hosp<-Baja_hosp[which(  Baja_hosp$all_hosp>0), ]
+# Constants ---------------
+## Call the function to plot ----
+source(here("src", "8.5-function-to-plot-models-and-effect-modifiers.R"))
+## Path for outputs ----
+path_out <- here("outputs", "figures", "cco-tmax")
+!dir.exists(path_out) && dir.create(path_out, recursive = TRUE)
 
-Baja_hosp$ID_grp<-seq.int(nrow(Baja_hosp)) 
+unique(df_full_models$exposure)
+nrow(df_full_models)
 
-```
-## Preparing exposure dataset
-As we are interested in looking at the lagged effect of heat waves, we create a new variables that indicates if a heat wave occurred 1 day before.
+# Data Processing ------
 
-```{r}
+## Select relevant rows ----
+df_full_models <- df_full_models |>  
+                            filter(!str_detect(exposure, "zip_only"))
+nrow(df_full_models_final)
 
-Baja_temp <- Baja_temp[order(Baja_temp$date), ]
+## Create Labels ----
+### For duration
+labels_duration_hd <- rep("Extreme heat day", 3)
+label_duration_hw <- c("Heatwave: 2 days", "Heatwave: 3 days", "Heatwave: 4 days", "Heatwave: 5 days")
+label_duration_hw_rep <- rep(label_duration_hw, 3)
+#### repeat the label 3*2 times
+labels_duration_temp <- c(labels_duration_hd, label_duration_hw_rep)
+labels_duration <- rep(labels_duration_temp, 2)
 
-Baja_temp <-Baja_temp %>% 
-  dplyr::mutate(Baja_temp, hw_lag1=lag(hw)) %>%
-  dplyr::group_by(munic) 
+### For thresholds
+labels_threshold_abs <- c("Tmax > 28°C", "Tmax > 30°C", "Tmax > 32°C")
+labels_threshold_abs <- rep(labels_threshold_abs, 5)
 
-```
-## Restructuring dataset to time-stratified case crossover format
-Here we merge in every row from the heat wave dataset that matches the case information in our outcome dataset for municipality, year, month and weekday. By doing this, we will have 3-4 additional rows for each original data line in our health data, with information about whether or not there was a heat wave that day. Then, we create a new variable, called case, which will be 1 when the date variable in our outcome dataset and exposure dataset are the same. These represent the original case days in our outcome dataset. The ID_grp variable which we created above will be the same across case and control matches, and will be used to indicate each strata of case and controls which the analysis will be matched on.
+labels_threshold_perc_single <- c("Tmax > 85th Percentile", "Tmax > 90th Percentile", "Tmax > 95th Percentile")
+labels_threshold_perc_multi <- rep(labels_threshold_perc_single, each = 4)
+labels_threshold_perc <- c(labels_threshold_perc_single, labels_threshold_perc_multi)
 
-```{r}
+#### combine these labels and repeat the label 4 times
+labels_threshold_comb <- c(labels_threshold_abs, labels_threshold_perc)
+length(labels_threshold_comb)
+# labels_threshold_comb_all_dep_vars <- rep(labels_threshold_comb, 3)
 
-Baja_data_cc <- Baja_hosp %>%       
-  dplyr::left_join(Baja_temp, by = c("munic","year", "month", "wday")) %>%  #add the temperature data
-  dplyr::mutate(case = if_else(case_date==date, 1, 0))            #generate case and control observations
-  
-```
+## Add labels to the dataframe ----
+df_full_models$duration_label <- labels_duration
+df_full_models$threshold_label <- labels_threshold_comb
+View(df_full_models)
 
-## Association between hospitalizations and same day heatwave for entire region
-We then run a conditional logistic model with fixed effect for each strata or ID_grp on the newly structured data. Since our original data was formatted in which the health variable was a total number of hospitalizations for each municipality-date, we then weight our regression by this variable of the number of hospitalizations. To understand the association in the whole region, we don't specify any subregion and it will provide us with an overall effect. 
-
-```{r}
-
-model_region<-clogit(case~ hw + strata(ID_grp), data=Baja_data_cc, weights=all_hosp, method="approximate")
-summary(model_region)
-
-```
-
-## Association between hospitalizations and same day heatwave for each municipality
-If we are interested in looking at subregions, we can conduct stratified analyses by municipality and compare results. 
-
-
-```{r}
-model_Tijuana<-clogit(case~ hw + strata(ID_grp), data=Baja_data_cc[Baja_data_cc$munic==4,], weights=all_hosp, method="approximate")
-summary(model_Tijuana)
+## Set order of duration variable ----
+## Order the levels of the Contrast variable
+ord_duration <- c("Extreme heat day", "Heatwave: 2 days", "Heatwave: 3 days", "Heatwave: 4 days", "Heatwave: 5 days")
+df_full_models$duration_label <- factor(df_full_models$duration_label, levels=ord_duration)
+df_full_models$duration_label <- fct_reorder(df_full_models$duration_label, desc(df_full_models$duration_label))
 
 
-model_Tecate<-clogit(case~ hw + strata(ID_grp), data=Baja_data_cc[Baja_data_cc$munic==3,], weights=all_hosp, method="approximate")
-summary(model_Tecate)
+# Plot and save ----
+
+## For absolute ----
+df_full_models_abs <- df_full_models |> filter(str_detect(exposure, "abs"))
+nrow(df_full_models_abs)
+head(df_full_models_abs)
+
+plot_abs <- func_plot_full_model(df_full_models_abs, title = "Absolute temperature based thresholds")
+ggsave(here(path_out, "plot_abs.jpeg"), plot_abs, width = 8, height = 10, dpi = 600)
 
 
-model_Rosarito<-clogit(case~ hw + strata(ID_grp), data=Baja_data_cc[Baja_data_cc$munic==5,], weights=all_hosp, method="approximate")
-summary(model_Rosarito)
-```
+## For percentile ----
+df_full_models_perc <- df_full_models |> filter(str_detect(exposure, "rel"))
+nrow(df_full_models_perc)
+head(df_full_models_perc)
 
-# Association between hospitalizations and previous day heat wave
-To look at lagged effect, we can use the lagged exposure variable which we created above in the model.
-
-```{r}
-
-model_Tijuana_lag<-clogit(case~ hw_lag1 + strata(ID_grp), data=Baja_data_cc[Baja_data_cc$munic==4,], weights=all_hosp, method="approximate")
-summary(model_Tijuana_lag)
-
-
-model_Tecate_lag<-clogit(case~ hw_lag1 + strata(ID_grp), data=Baja_data_cc[Baja_data_cc$munic==3,], weights=all_hosp, method="approximate")
-summary(model_Tecate_lag)
-
-
-model_Rosarito_lag<-clogit(case~ hw_lag1 + strata(ID_grp), data=Baja_data_cc[Baja_data_cc$munic==5,], weights=all_hosp, method="approximate")
-summary(model_Rosarito_lag)
-
-
-
-model_Region_lag<-clogit(case~ hw_lag1 + strata(ID_grp), data=Baja_data_cc, weights=all_hosp, method="approximate")
-summary(model_Region_lag)
-```
+plot_perc <- func_plot_full_model(df_full_models_perc, title = "Percentile based thresholds")
+ggsave(here(path_out, "plot_perc.jpeg"), plot_perc, width = 8, height = 10, dpi = 600)

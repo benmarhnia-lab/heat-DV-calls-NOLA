@@ -5,14 +5,15 @@ pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom
 # Constants ----
 path_processed_data <- here("data", "processed-data")
 source(here("src", "8.4-function-to-est-perc-cutoff-rolling.R"))
-heat_var <- "tmax"
-vec_cutoffs_abs <- c(29, 31, 33)
+heat_var <- "heat_index"
+vec_cutoffs_abs <- c(23, 25, 27)
 vec_cutoffs_perc <- c(0.85, 0.90, 0.95)
 vec_duration <- c(2, 3, 4, 5)
 
 # Read data ----
-df_temp_data_nola <- read_fst(here(path_processed_data, "2.1_nola_tmax_zip_code.fst"), as.data.table = TRUE)
-# head(df_temp_data_nola)
+df_temp_data_nola <- read_fst(here(path_processed_data, "2.5_nola_heat_index_zip_code.fst"), as.data.table = TRUE)
+head(df_temp_data_nola)
+sum(is.na(df_temp_data_nola$wbgt_max))
 # min(df_temp_data_nola$date)
 # max(df_temp_data_nola$date)
 
@@ -51,16 +52,25 @@ max(df_temp_data_nola$date)
 
 # Create vectors of cutoff variables and values and for duration ----
 vec_varlist_cutoffs_perc <- colnames(df_temp_data_nola)[grepl("cutoff", colnames(df_temp_data_nola))]
-
+head(df_temp_data_nola)
 # Create extreme heat days ----
 ## For n-tiles
 for (var in vec_varlist_cutoffs_perc) {
   # Create new variable name by replacing "cutoff" with "hotday"
   new_var <- gsub("cutoff", "rel_hd", var)
   
-  # Create the new variable
-  df_temp_data_nola[[new_var]] <- ifelse(df_temp_data_nola[[heat_var]] >= df_temp_data_nola[[var]], 1, 0)
+  # Debug: Print variable names
+  print(paste("Processing:", var, "->", new_var))
+  
+  # Check if the variable exists
+  if (var %in% names(df_temp_data_nola)) {
+    # Create the new variable
+    df_temp_data_nola[[new_var]] <- ifelse(df_temp_data_nola[[heat_var]] >= df_temp_data_nola[[var]], 1, 0)
+  } else {
+    warning(paste("Variable", var, "not found in df_temp_data_nola"))
+  }
 }
+
 colnames(df_temp_data_nola)
 
 ## For absolute values
@@ -131,6 +141,6 @@ df_temp_data_nola |> select(starts_with("abs_hd")) |> summary()
 df_temp_data_nola |> select(starts_with("rel_hw")) |> summary()
 
 # Save Work
-write_fst(df_temp_data_nola, path = here(path_processed_data, "2.2-clim-vars-tmax.fst"))
+write_fst(df_temp_data_nola, path = here(path_processed_data, "2.6-clim-vars-heat-index.fst"))
 
 colnames(df_temp_data_nola)

@@ -32,13 +32,15 @@ path_function <- here("src", "8.2-function-to-extract-climate-data-multiple-nic-
 source(path_function)
 
 # Extract temperature data for NOLA zip codes ----
-# path_wbgt_data <- here("data", "raw-data", "wbgt_max_raw") 
-path_wbgt_data <- ("Z:/Shared drives/Benmarhnia Lab/Arnab/common-datasets/climate-datasets/world-temp-wetbulb-max/")
+path_wbgt_data <- here("data", "raw-data", "wbgt-ecmwf") 
+# path_wbgt_data <- ("Z:/Shared drives/Benmarhnia Lab/Arnab/common-datasets/climate-datasets/world-temp-wetbulb-max/")
 df_nola_zip_temp <- func_extract_clim_data_shp(path_nic_files = path_wbgt_data, 
                                  sf_file = zctas_nola_nopd, 
                                  sf_file_admin = "Zip")
 
-head(df_nola_zip_temp)
+min(df_nola_zip_temp$date)
+max(df_nola_zip_temp$date)
+
 
 # Rename variables ----
 df_nola_zip_temp <- df_nola_zip_temp |> 
@@ -49,8 +51,8 @@ df_nola_zip_temp <- df_nola_zip_temp |>
 head(df_nola_zip_temp)
 
 # Save file
-write_fst(df_nola_zip_temp, here(path_processed_data, "2.2_nola_wbgt_zip_code.fst"))
+write_fst(df_nola_zip_temp, here(path_processed_data, "2.3_nola_wbgt_zip_code.fst"))
 
-# df_nola_zip_temp <- read_fst(here(path_processed_data, "2.1_nola_wbgt_zip_code.fst"), as.data.table = TRUE)
+# df_nola_zip_temp <- read_fst(here(path_processed_data, "2.3_nola_wbgt_zip_code.fst"), as.data.table = TRUE)
 
 # Diagnostic
