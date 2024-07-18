@@ -52,18 +52,19 @@ list_call_type_DV <- c("AGGRAVATED ASSAULT DOMESTIC", "AGGRAVATED BATTERY DOMEST
                         "SIMPLE ASSAULT DOMESTIC",  "SIMPLE BATTERY DOMESTIC", "SIMPLE BURGLARY DOMESTIC")
 
 ## Create a new column to identify cases that may be Domestic Violence related -----
-df_nopd_dv_cases <- combined_df |> 
-    mutate(DV_related = ifelse(TypeText %in% list_call_type_DV, 1, 0)) |>
-    filter(DV_related == 1)
+df_nopd_full <- combined_df |> mutate(DV_related = ifelse(TypeText %in% list_call_type_DV, 1, 0)) 
+nrow(df_nopd_full)
+df_nopd_dv_cases <- df_nopd_full |> filter(DV_related == 1)
 nrow(df_nopd_dv_cases)
 
 ## Save work for step-2
-write_fst(df_nopd_dv_cases, here(path_processed_data, "1.1a-nopd-calls-raw-dv-only.fst"))
+write_fst(df_nopd_full, here(path_processed_data, "1.1a-nopd-calls-raw-all-cases.fst"))
+write_fst(df_nopd_dv_cases, here(path_processed_data, "1.1b-nopd-calls-raw-dv-only.fst"))
 
 # Step-3: Create a unique list of TypeText
 type_text <- sort(unique(combined_df$TypeText))
 type_text <- as.data.frame(type_text)
 nrow(type_text)
 ## Save outputs
-write.xlsx(type_text, here(path_processed_data, "1.1a-nopd-call-type-categories.xlsx"), 
+write.xlsx(type_text, here(path_processed_data, "1.1-nopd-call-type-categories.xlsx"), 
   sheetName = "call_type_categories")

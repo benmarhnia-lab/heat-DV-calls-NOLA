@@ -1,15 +1,16 @@
-# This script extracts the maximum temperature data for the zip codes in New Orleans.
+# This script extracts the Heat Index data for the zip codes in New Orleans.
 
 # Load packages ----
+rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
 pacman::p_load(sf, sp, terra, tidyterra, ncdf4, tigris)
-rm(list = ls())
 
 # Step-1: Read Shape file for NOLA zip codes ---- 
 ## Get the shape file of zip codes using tigris
+options(tigris_use_cache = TRUE)
 zctas_nola_70 <- tigris::zctas(starts_with = c("70"))
-class(zctas_nola_70)
-plot(zctas_nola_70)
+class(zctas_nola_70) # sf/data-frame
+# plot(zctas_nola_70[1])
 nrow(zctas_nola_70)
 length(unique(zctas_nola_70$ZCTA5CE20))
 
@@ -27,20 +28,23 @@ class(zctas_nola_nopd)
 length(unique(zctas_nola_nopd$Zip)) # 17 zip codes
 
 # Load the function
-path_function <- here("src", "8.1-function-to-extract-climate-data.R")
+path_function <- here("src", "8.1-function-to-extract-climate-data-single-nic-file.R")
 source(path_function)
 
 # Extract temperature data for NOLA zip codes ----
-path_wbgt_data <- here("data", "raw-data", "wbgt_max_raw") 
+path_wbgt_data <- here("data", "raw-data", "heat-index") 
 df_nola_zip_temp <- func_extract_clim_data_shp(path_nic_files = path_wbgt_data, 
                                  sf_file = zctas_nola_nopd, 
-                                 sf_file_admin = "Zip")
+                                 sf_file_admin = "Zip",
+                                 nic_file_name = "heat_index_daily.nc")
+
+head(df_nola_zip_temp)
 
 # Rename variables ----
 df_nola_zip_temp <- df_nola_zip_temp |> 
                         mutate(Zip = Attribute,
-                                wbgt_max = clim_daily_mean)
+                                heat_index = clim_daily_mean)
 
 # Save file
-write_fst(df_nola_zip_temp, here(path_processed_data, "2.1_nola_temp_zip_code.fst"))
+write_fst(df_nola_zip_temp, here(path_processed_data, "2.1_nola_heat_index_zip_code.fst"))
 

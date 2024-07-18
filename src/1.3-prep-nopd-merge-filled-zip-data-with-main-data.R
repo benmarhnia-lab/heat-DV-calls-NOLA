@@ -1,5 +1,5 @@
-# This script merges the filled zip data with the main data. 
-# The filled data was provided by Edwin and Namratha.
+#' This script merges the filled zip data with the main data. 
+#' The filled data was provided by Edwin and Namratha.
 
 # Load packages ----
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
@@ -8,7 +8,7 @@ rm(list = ls())
 # Read data
 ## Read raw-dv data
 path_processed_data <- here("data", "processed-data")
-df_nopd_dv_cases_all <- read_fst(here(path_processed_data, "1.1a-nopd-calls-raw-dv-only.fst"), as.data.table = TRUE)
+df_nopd_dv_cases_all <- read_fst(here(path_processed_data, "1.1b-nopd-calls-raw-dv-only.fst"), as.data.table = TRUE)
 nrow(df_nopd_dv_cases_all) # 167,042 cases
 
 ### Subset of data where zip code is missing
@@ -50,4 +50,4 @@ nrow(df_missing_zip_new)
 
 ## Save the data ----
 write_fst(df_nopd_dv_cases_full, 
-    here(path_processed_data, "1.1c-nopd-calls-raw-dv-only-completed.fst"))
+    here(path_processed_data, "1.3-nopd-calls-raw-dv-only-completed.fst"))

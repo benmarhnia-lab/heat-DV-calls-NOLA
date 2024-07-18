@@ -1,15 +1,25 @@
+rm(list = ls())
 library(tidyverse)
 library(survival)
+library(here)
 
 # Read Data ----
-df_nopd_climate_merged <- read_fst("D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/3.1-nopd-climate-merged.fst", 
-                                   as.data.table = TRUE)
+# Read data ----
+path_processed <- here("data", "processed-data")
+df_nopd_climate_merged <- read_fst(here(path_processed, "3.1-nopd-climate-merged.fst"), as.data.table = TRUE)
 colnames(df_nopd_climate_merged)
+tabyl(df_nopd_climate_merged, dv_case)
 
 # Conditional Logit Model ----
-model_1 <- clogit(dv_case ~ hotday_30 + strata(ID_grp), 
+
+df_nopd_climate_merged2 <- df_nopd_climate_merged |> 
+  filter(year > 2014 & year < 2023)
+
+View(df_nopd_climate_merged2)
+
+model_1 <- clogit(dv_case ~ hw_97_wb_2d + strata(ID_grp), 
                   weights = DV_count,
-                  data=df_nopd_climate_merged, 
+                  data=df_nopd_climate_merged2, 
                   method="approximate")
 summary(model_1)
 
@@ -45,7 +55,8 @@ Baja_temp %>%
 ```
 
 ## Preparing outcome dataset
-We can delete any missing data as any row which does not have any hospitalization as this day will not be considered in our analysis. We will also need a unique identifier for each row which will represent each case-control combination in our final dataset. 
+# We can delete any missing data as any row which does not have any hospitalization as this day will not be considered in our analysis. 
+# We will also need a unique identifier for each row which will represent each case-control combination in our final dataset. 
 ```{r}
 Baja_hosp<-Baja_hosp[which(  Baja_hosp$all_hosp>0), ]
 

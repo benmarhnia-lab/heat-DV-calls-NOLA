@@ -1,16 +1,81 @@
-library(googledrive)
-library(here)
+path_nic_files <- "Z:/Shared drives/Benmarhnia Lab/Arnab/common-datasets/climate-datasets/world-temp-drybulb-max/nola"  
+sf_file <-  zctas_nola_nopd
+sf_file_admin <- "Zip"
 
-here_wbgt_max_raw <- here("data", "raw-data", "wbgt_max_raw")
-if(!dir.exists(here_wbgt_max_raw)) {dir.create(here_wbgt_max_raw, showWarnings = TRUE, recursive = TRUE)}
+sf_file_wgs84 <- st_transform(sf_file, crs = 4326)
+## Convert sf object to SpatVector
+sf_file_sv <- vect(sf_file_wgs84)
+# Step-2: Extract Clim data for admin units
+## Get the list of nic files
+clim_files <- list.files(path = path_nic_files, pattern ="\\.nc")
 
-### Point to the folder on Googledrive
-folder_id_tmax_wb <- "1K0MrLG5RhFVnoDOE3F0amlz5CiyTuqQ_"
+results_df <- data.frame()
+nic_file <- clim_files[1]
 
-files_tmax_wb <- googledrive::drive_ls(as_id(folder_id_tmax_wb))
+# Read the NIC file as a SpatRaster
+clim_data_rast <- rast(here(path_nic_files, nic_file))
+class(clim_data_rast)
+res(clim_data_rast)
+ext(clim_data_rast)
+clim_data_rast <- rotate(clim_data_rast)
 
-### Download the relevant file to the local folder
-for (i in seq_len(nrow(files_tmax_wb))) {
-    cur_file <- files_tmax_wb[i, ]
-    googledrive::drive_download(as_id(cur_file$id), 
-      path = here(here_wbgt_max_raw, cur_file$name))}
+i <- 1
+# Loop through each area defined in the SpatVector
+
+# Extract the user-defined attribute
+summary(sf_file_sv[1])
+
+area_attribute <- sf_file_sv[[sf_file_admin]][,1][i]
+# Extract the area of interest from the climate data
+area_clim_data_rast <- crop(clim_data_rast, sf_file_sv[i, ])
+area_mean_temp <- extract(area_clim_data_rast, sf_file_sv[i, ], fun = mean, na.rm = TRUE)
+
+# Assuming climate data is daily, compile the mean climate for each day
+clim_daily_mean <- sapply(area_mean_temp, mean, na.rm = TRUE)
+
+# Drop the first column which is the ID
+clim_daily_mean <- clim_daily_mean[-1]
+
+# Convert to a data frame and add necessary columns
+clim_df <- as.data.frame(clim_daily_mean)
+clim_df$Attribute <- area_attribute
+
+# Get start and end dates from the nc file
+## Open the NetCDF file
+nc_data <- nc_open(here(path_nic_files, nic_file))
+### Get the time variable
+time_var <- ncvar_get(nc_data, "time")
+time_units <- ncatt_get(nc_data, "time", "units")$value
+### Extract the reference date from the time units
+ref_date_str <- sub(".*since ", "", time_units)
+### Determine the time unit (days, hours, etc.)
+unit <- strsplit(time_units, " ")[[1]][1]
+### Convert the reference date string to a Date or POSIXct object
+if(grepl("days", time_units)) {
+        ref_date <- as.Date(ref_date_str)
+        actual_dates <- ref_date + as.numeric(time_var)  # Add time_var as days
+        } else if(grepl("seconds", time_units)) {
+        ref_date <- as.POSIXct(ref_date_str, tz = "UTC")
+        actual_dates <- ref_date + dseconds(as.numeric(time_var))  # Add time_var as seconds
+        } else if(grepl("minutes", time_units)) {
+        ref_date <- as.POSIXct(ref_date_str, tz = "UTC")
+        actual_dates <- ref_date + dminutes(as.numeric(time_var))  # Add time_var as minutes
+        } else if(grepl("hours", time_units)) {
+        ref_date <- as.POSIXct(ref_date_str, tz = "UTC")
+        actual_dates <- ref_date + dhours(as.numeric(time_var))  # Add time_var as hours
+        } else {
+        stop("Time units not recognized or supported")
+}
+### Get the start and end dates
+start_date <- min(actual_dates) 
+end_date <- max(actual_dates)
+### Close the NetCDF file when done
+nc_close(nc_data)
+
+dates <- seq(as.Date(start_date), as.Date(end_date), by="days")
+# Add the dates to the results data frame
+clim_df$date <- dates
+
+# Bind the dataset and order variables
+results_df <- rbind(results_df, clim_df)
+results_df <- results_df |> select(date, Attribute, clim_daily_mean)

@@ -19,7 +19,7 @@ func_extract_clim_data_shp <- function(path_nic_files,
                 # Read the NIC file as a SpatRaster
                 #   nic_file <- clim_files[1]
                 clim_data_rast <- rast(here(path_nic_files, nic_file))
-  
+                clim_data_rast <- rotate(clim_data_rast)
                 # Loop through each area defined in the SpatVector
                 for (i in 1:nrow(sf_file_sv)) {
                         # Extract the user-defined attribute
@@ -69,7 +69,7 @@ func_extract_clim_data_shp <- function(path_nic_files,
                         ### Close the NetCDF file when done
                         nc_close(nc_data)
 
-                        dates <- seq(as.Date(start_date), as.Date(end_date), by=unit)
+                        dates <- seq(as.Date(start_date), as.Date(end_date), by="days")
 
                         # Add the dates to the results data frame
                         clim_df$date <- dates
