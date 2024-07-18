@@ -54,7 +54,6 @@ for(exposure in names(tidy_outputs)) {
 ## Write Step-1 output to a file
 saveWorkbook(wb, here(path_out, "models_cco_tmax.xlsx"), overwrite = TRUE)
 
-
 # Step-2: Consolidate coefficients for the primary exposure  in a single CSV ----
 ## Initialize an empty dataframe to store the estimates for the exposure
 combined_exposures <- data.frame(a = integer(), b = integer())

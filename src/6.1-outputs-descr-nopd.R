@@ -8,9 +8,12 @@ library(here)
 
 # Read data ----
 ## Full Data -----
+
+## NOPD - DV calls data -----
 df_nopd_vars_crtd <- read_fst("D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/nopd_calls_comb_vars_crtd.fst")
 
 ## DV aggregated data -----
+df_dv_agg <- read_fst(here(path_processed, "1.4-DV-cases-agg.fst"), as.data.table = TRUE)
 df_dv_agg <- read_fst("D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/1.3-DV-cases-agg.fst", 
                               as.data.table = TRUE)
 

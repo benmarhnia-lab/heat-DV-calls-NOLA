@@ -6,8 +6,8 @@ pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom
 path_processed_data <- here("data", "processed-data")
 source(here("src", "8.4-function-to-est-perc-cutoff-rolling.R"))
 heat_var <- "tmax"
-vec_cutoffs_abs <- c(30, 32, 35)
-vec_cutoffs_perc <- c(0.9, 0.95, 0.97)
+vec_cutoffs_abs <- c(29, 31, 33)
+vec_cutoffs_perc <- c(0.85, 0.90, 0.95)
 vec_duration <- c(2, 3, 4, 5)
 
 # Read data ----
@@ -33,10 +33,10 @@ colnames(df_temp_data_nola)
 setDT(df_temp_data_nola)
 for (val in vec_cutoffs_perc) {
         ## Create new variable using ZIP and DOY
-        new_var_zip_doy <- paste0("cutoff_", val*100, "_zip_doy")
+        new_var_zip_doy <- paste0("cutoff_", "zip_doy_",  val*100)
         df_temp_data_nola[, (new_var_zip_doy) := quantile(get(heat_var), probs = val, na.rm = TRUE), by = .(Zip, day_of_year)]
         ## Create new variable using ZIP only
-        new_var_zip <- paste0("cutoff_", val*100, "_zip")
+        new_var_zip <- paste0("cutoff_", "zip_only_", val*100)
         df_temp_data_nola[, (new_var_zip) := quantile(get(heat_var), probs = val, na.rm = TRUE), by = .(Zip)]
 }
 colnames(df_temp_data_nola)
@@ -56,7 +56,7 @@ vec_varlist_cutoffs_perc <- colnames(df_temp_data_nola)[grepl("cutoff", colnames
 ## For n-tiles
 for (var in vec_varlist_cutoffs_perc) {
   # Create new variable name by replacing "cutoff" with "hotday"
-  new_var <- gsub("cutoff", "hd_rel", var)
+  new_var <- gsub("cutoff", "rel_hd", var)
   
   # Create the new variable
   df_temp_data_nola[[new_var]] <- ifelse(df_temp_data_nola$tmax >= df_temp_data_nola[[var]], 1, 0)
@@ -66,7 +66,7 @@ colnames(df_temp_data_nola)
 ## For absolute values
 for (val in vec_cutoffs_abs) {
   # Create new variable name by replacing "cutoff" with "hotday"
-  new_var <- paste0("hd_abs_", val)
+  new_var <- paste0("abs_hd_", val)
   
   # Create the new variable
   df_temp_data_nola[[new_var]] <- ifelse(df_temp_data_nola$tmax >= val, 1, 0)
@@ -77,17 +77,16 @@ colnames(df_temp_data_nola)
 # Create variables for consecutive days ----
 
 ## Identify all variables that start with "hotday"
-vec_hotday_vars <- colnames(df_temp_data_nola)[grepl("hd", colnames(df_temp_data_nola))]
+vec_hotday_vars <- colnames(df_temp_data_nola)[grepl("rel_hd|abs_hd", colnames(df_temp_data_nola))]
 
 ## Create the variables in a loop
-
 setDT(df_temp_data_nola)
 
 # Create the variables in a loop
 for (var in vec_hotday_vars) {
-  # Create new variable name by replacing "hotday_tmax" with "consec"
-  new_var <- gsub("hd", "consec", var)
-  
+  # Create new variable name by appending "consec" to the variable name
+  new_var <- paste0("consec_", var)
+
   # Print debugging information
   cat("Processing:", var, "->", new_var, "\n")
   
@@ -112,8 +111,9 @@ vec_consec_vars <- colnames(df_temp_data_nola)[grepl("consec", colnames(df_temp_
 ## Create the variables in a loop
 for (var in vec_consec_vars) {
         for (duration in vec_duration) {
-                # Create new variable name by replacing "consec" with "heatwave"
-                new_var <- gsub("consec", "hw", var)
+                # Create new variable name by dropping "consec_" and replacing "hd" with "hw"                
+                new_var <- gsub("consec_", "", var)
+                new_var <- gsub("hd", "hw", new_var)
                 new_var <- paste0(new_var, "_", duration, "d")
                 # Create the new variable
                 df_temp_data_nola[[new_var]] <- ifelse(df_temp_data_nola[[var]] >= duration, 1, 0)
@@ -126,11 +126,11 @@ print(Sys.time())
 # Check dataset ----
 # View(df_temp_data_nola |> filter(Zip == "70125"))
 ## Generate a summary of all hotday variables 
-df_temp_data_nola |> select(starts_with("hd")) |> summary()
+df_temp_data_nola |> select(starts_with("abs_hd")) |> summary()
 ## Generate a summary of all heatwave variables 
-df_temp_data_nola |> select(starts_with("hw")) |> summary()
+df_temp_data_nola |> select(starts_with("rel_hw")) |> summary()
 
 # Save Work
 write_fst(df_temp_data_nola, path = here(path_processed_data, "2.2-clim-vars-tmax.fst"))
 
-
+colnames(df_temp_data_nola)

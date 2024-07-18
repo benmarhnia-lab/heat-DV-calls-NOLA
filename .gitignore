@@ -1,3 +1,4 @@
 data/
-dummy.R
+outputs/
+dummy*.R
 

@@ -13,7 +13,9 @@ df_cco_tmax <- read_fst(here(path_processed, "3.1-cco-data-tmax.fst"), as.data.t
 # List of exposure variables ----
 colnames(df_cco_tmax)
 ## List all variables that start with "hd" or "hw"
-varlist_exp_all <- colnames(df_cco_tmax)[grepl("hd|hw", colnames(df_cco_tmax))]
+varlist_exp_abs <- colnames(df_cco_tmax)[grepl("^abs", colnames(df_cco_tmax))]
+varlist_exp_rel <- colnames(df_cco_tmax)[grepl("^rel", colnames(df_cco_tmax))]
+varlist_exp_all <- c(varlist_exp_abs, varlist_exp_rel)
 
 ## Register parallel backend
 no_cores <- detectCores() - 1
