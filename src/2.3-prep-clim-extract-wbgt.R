@@ -16,16 +16,16 @@ length(unique(zctas_nola_70$ZCTA5CE20))
 
 ## Get list of Zip codes used in the NOPD-DV ----- 
 path_processed_data <- here("data", "processed-data")
-df_nopd_dv_cases <- read_fst(here(path_processed_data, "1.1d-DV-cases-agg.fst"), as.data.table = TRUE)
+df_nopd_dv_cases <- read_fst(here(path_processed_data, "1.4-DV-cases-agg.fst"), as.data.table = TRUE)
 zips_nopd_dv <- unique(df_nopd_dv_cases$Zip)
-length(zips_nopd_dv) # 17 zip codes
+length(zips_nopd_dv) # 29 zip codes
 
 ## Retain only those zip codes that are in NOPD-DV data
 zctas_nola_nopd <- zctas_nola_70 |> 
                         filter(ZCTA5CE20 %in% zips_nopd_dv) |>
                         mutate(Zip = ZCTA5CE20)
 class(zctas_nola_nopd)
-length(unique(zctas_nola_nopd$Zip)) # 17 zip codes
+length(unique(zctas_nola_nopd$Zip)) # 16 zip codes
 
 # Load the function
 path_function <- here("src", "8.2-function-to-extract-climate-data-multiple-nic-files.R")
@@ -43,11 +43,14 @@ head(df_nola_zip_temp)
 # Rename variables ----
 df_nola_zip_temp <- df_nola_zip_temp |> 
                         mutate(Zip = Attribute,
-                                wbgt_max = clim_daily_mean)
+                                wbgt_max = clim_daily_mean) |> 
+                        select(-Attribute, -clim_daily_mean)
 
 head(df_nola_zip_temp)
 
 # Save file
-write_fst(df_nola_zip_temp, here(path_processed_data, "2.1_nola_wbgt_zip_code.fst"))
+write_fst(df_nola_zip_temp, here(path_processed_data, "2.2_nola_wbgt_zip_code.fst"))
 
-df_nola_zip_wbgt <- read_fst(here(path_processed_data, "2.1_nola_wbgt_zip_code.fst"), as.data.table = TRUE)
+# df_nola_zip_temp <- read_fst(here(path_processed_data, "2.1_nola_wbgt_zip_code.fst"), as.data.table = TRUE)
+
+# Diagnostic

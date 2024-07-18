@@ -1,10 +1,6 @@
 # Libraries ----
 rm(list = ls())
-library(tidyverse)
-library(fst)
-library(data.table)
-library(janitor)
-library(here)
+pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
 
 # Read data ----
 path_processed_data <- here("data", "processed-data")
@@ -102,6 +98,6 @@ print("heatwave vars created")
 print(Sys.time())
 
 # Save Work
-write_fst(df_temp_data_nola, path = here(path_processed_data, "3.1-nola-zip-temp-vars-created.fst"))
+write_fst(df_temp_data_nola, path = here(path_processed_data, "3.1-lt-clim-vars-wbgt.fst"))
 
 

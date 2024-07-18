@@ -1,17 +1,18 @@
 rm(list = ls())
-library(tidyverse)
+pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
 library(survival)
-library(here)
 
 # Read Data ----
 # Read data ----
 path_processed <- here("data", "processed-data")
-df_nopd_climate_merged <- read_fst(here(path_processed, "3.1-nopd-climate-merged.fst"), as.data.table = TRUE)
+df_cco_wbgt <- read_fst(here(path_processed, "4.1-a-cco-data-wbgt.fst"), as.data.table = TRUE)
+df_cco_tmax <- read_fst(here(path_processed, "4.1-b-cco-data-tmax.fst"), as.data.table = TRUE)
+
 colnames(df_nopd_climate_merged)
 tabyl(df_nopd_climate_merged, dv_case)
 
 # Conditional Logit Model ----
-
+## WBGT
 df_nopd_climate_merged2 <- df_nopd_climate_merged |> 
   filter(year > 2014 & year < 2023)
 
@@ -19,10 +20,17 @@ View(df_nopd_climate_merged2)
 
 model_1 <- clogit(dv_case ~ hw_97_wb_2d + strata(ID_grp), 
                   weights = DV_count,
-                  data=df_nopd_climate_merged2, 
+                  data=df_cco_wbgt, 
                   method="approximate")
 summary(model_1)
 
+## Tmax
+model_2 <- clogit(dv_case ~ hw_33_db_5d + strata(ID_grp), 
+                  weights = DV_count,
+                  data=df_cco_tmax, 
+                  method="approximate")
+# head(df_cco_tmax$dv_case)
+summary(model_2)
 ## Old codes
 
 ## Dataset preparation-uploading data

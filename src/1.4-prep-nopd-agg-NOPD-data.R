@@ -30,11 +30,11 @@ df_dv_cases_agg <- df_dv_cases_agg[, ':=' (
                       year = lubridate::year(date),
                       month = lubridate::month(date),
                       weekday = lubridate::wday(date, label = TRUE),
-                      case_date = date)]
+                      case_date = date)][, date := NULL]
 
 nrow(df_dv_cases_agg) # 60083
 length(unique(df_dv_cases_agg$Zip)) # 29
-View(head(df_dv_cases_agg))
+# View(head(df_dv_cases_agg))
 
 # Drop Zip codes with less than 50 cases
 ## Identify Zip codes with less than 50 cases
@@ -48,4 +48,4 @@ View(head(df_dv_cases_agg))
 # Save file ----
 write_fst(df_dv_cases_agg, here(path_processed_data, "1.4-DV-cases-agg.fst"))
 # df_dv_cases_agg <- read_fst(here(path_processed_data, "1.4-DV-cases-agg.fst"))
-length(unique(df_dv_cases_agg$Zip)) 
+length(unique(df_dv_cases_agg$Zip)) # 29

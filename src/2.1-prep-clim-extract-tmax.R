@@ -10,7 +10,6 @@ pacman::p_load(sf, sp, terra, tidyterra, ncdf4, tigris)
 ## Get the shape file of zip codes using tigris
 options(tigris_use_cache = TRUE)
 zctas_nola_70 <- tigris::zctas(starts_with = c("70"))
-# zctas_new_orleans <- tigris::zctas(state = "LA", year = 2010)
 
 ### Check the data
 summary(zctas_nola_70)
@@ -45,7 +44,7 @@ path_function <- here("src", "8.2-function-to-extract-climate-data-multiple-nic-
 source(path_function)
 
 # Extract temperature data for NOLA zip codes ----
-path_tmax_data <- ("Z:/Shared drives/Benmarhnia Lab/Arnab/common-datasets/climate-datasets/world-temp-drybulb-max/nola")
+path_tmax_data <- ("Z:/Shared drives/Benmarhnia Lab/Arnab/common-datasets/climate-datasets/world-temp-drybulb-max/1979-2023")
 df_nola_zip_temp <- func_extract_clim_data_shp(path_nic_files = path_tmax_data, 
                                  sf_file = zctas_nola_nopd, 
                                  sf_file_admin = "Zip")
@@ -55,11 +54,17 @@ head(df_nola_zip_temp)
 # Rename variables ----
 df_nola_zip_temp <- df_nola_zip_temp |> 
                         mutate(Zip = Attribute,
-                                tmax_max = clim_daily_mean)
+                                tmax = clim_daily_mean) |> 
+                        select(-Attribute, -clim_daily_mean)
 
 head(df_nola_zip_temp)
 
+
 # Save file
 write_fst(df_nola_zip_temp, here(path_processed_data, "2.1_nola_tmax_zip_code.fst"))
+# df_nola_zip_tmax <- read_fst(here(path_processed_data, "2.1_nola_tmax_zip_code.fst"), as.data.table = TRUE)
 
-df_nola_zip_tmax <- read_fst(here(path_processed_data, "2.1_nola_tmax_zip_code.fst"), as.data.table = TRUE)
+# Diagnostics
+head(df_nola_zip_temp)
+dim(df_nola_zip_temp)
+26*365*45
