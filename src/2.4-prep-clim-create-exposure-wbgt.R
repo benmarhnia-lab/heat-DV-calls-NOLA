@@ -1,6 +1,7 @@
 # Libraries ----
 rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
+pacman::p_load(parallel, doParallel, foreach)
 
 # Constants ----
 path_processed_data <- here("data", "processed-data")
@@ -41,7 +42,15 @@ for (val in vec_cutoffs_perc) {
         df_temp_data_nola[, (new_var_zip) := quantile(get(heat_var), probs = val, na.rm = TRUE), by = .(Zip)]
 }
 colnames(df_temp_data_nola)
-print("step-1-complete")
+print("step-1a-complete")
+print(Sys.time())
+
+## Create rolling cutoffs using long-term data --------
+df_roll <- calc_roll_perc_parallel(df_temp_data_nola, var_col = heat_var, ntile = vec_cutoffs_perc[2], num_days = 3, psu_col = "Zip")
+
+### merge the rolling cutoffs with the main dataset
+df_temp_data_nola <- merge(df_temp_data_nola, df_roll, by.x = c("date", "Zip"), by.y = c("date", "PSU"), all.x = TRUE)
+print("step-1b-complete")
 print(Sys.time())
 
 # Filter to cases between 2011 and 2023 --------
