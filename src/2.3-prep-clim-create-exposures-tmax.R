@@ -1,25 +1,21 @@
 # Libraries ----
 rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
-pacman::p_load(parallel, doParallel, foreach)
 
 # Constants ----
 path_processed_data <- here("data", "processed-data")
-source(here("src", "8.4-function-to-est-perc-cutoff-rolling.R"))
-heat_var <- "wbgt_max"
-vec_cutoffs_abs <- c(23, 25, 27)
+heat_var <- "tmax"
+vec_cutoffs_abs <- c(29, 31, 33)
 vec_cutoffs_perc <- c(0.85, 0.90, 0.95)
 vec_duration <- c(2, 3, 4, 5)
 
 # Read data ----
-df_temp_data_nola <- read_fst(here(path_processed_data, "2.3_nola_wbgt_zip_code.fst"), as.data.table = TRUE)
-head(df_temp_data_nola)
-sum(is.na(df_temp_data_nola$wbgt_max))
+df_temp_data_nola <- read_fst(here(path_processed_data, "2.2_nola_tmax_zip_cutoffs_added_90.fst"), as.data.table = TRUE)
+# head(df_temp_data_nola)
 # min(df_temp_data_nola$date)
 # max(df_temp_data_nola$date)
 
 length(unique(df_temp_data_nola$Zip)) # 26 zip codes
-
 
 # Create basic date variables ---------
 df_temp_data_nola <- df_temp_data_nola[, ':=' (
@@ -29,29 +25,6 @@ df_temp_data_nola <- df_temp_data_nola[, ':=' (
                                         day_of_year = lubridate::yday(date))]
 
 colnames(df_temp_data_nola)
-# Create temperature cutoffs using long-term data --------
-
-## Cut offs using Zip code and day of year
-setDT(df_temp_data_nola)
-for (val in vec_cutoffs_perc) {
-        ## Create new variable using ZIP and DOY
-        new_var_zip_doy <- paste0("cutoff_", "zip_doy_",  val*100)
-        df_temp_data_nola[, (new_var_zip_doy) := quantile(get(heat_var), probs = val, na.rm = TRUE), by = .(Zip, day_of_year)]
-        ## Create new variable using ZIP only
-        new_var_zip <- paste0("cutoff_", "zip_only_", val*100)
-        df_temp_data_nola[, (new_var_zip) := quantile(get(heat_var), probs = val, na.rm = TRUE), by = .(Zip)]
-}
-colnames(df_temp_data_nola)
-print("step-1a-complete")
-print(Sys.time())
-
-## Create rolling cutoffs using long-term data --------
-df_roll <- calc_roll_perc_parallel(df_temp_data_nola, var_col = heat_var, ntile = vec_cutoffs_perc[2], num_days = 3, psu_col = "Zip")
-
-### merge the rolling cutoffs with the main dataset
-df_temp_data_nola <- merge(df_temp_data_nola, df_roll, by.x = c("date", "Zip"), by.y = c("date", "PSU"), all.x = TRUE)
-print("step-1b-complete")
-print(Sys.time())
 
 # Filter to cases between 2011 and 2023 --------
 df_temp_data_nola <- df_temp_data_nola[base::`<=`(df_temp_data_nola$date, as.Date("2023-12-31")), ]
@@ -61,25 +34,16 @@ max(df_temp_data_nola$date)
 
 # Create vectors of cutoff variables and values and for duration ----
 vec_varlist_cutoffs_perc <- colnames(df_temp_data_nola)[grepl("cutoff", colnames(df_temp_data_nola))]
-head(df_temp_data_nola)
+
 # Create extreme heat days ----
 ## For n-tiles
 for (var in vec_varlist_cutoffs_perc) {
   # Create new variable name by replacing "cutoff" with "hotday"
   new_var <- gsub("cutoff", "rel_hd", var)
   
-  # Debug: Print variable names
-  print(paste("Processing:", var, "->", new_var))
-  
-  # Check if the variable exists
-  if (var %in% names(df_temp_data_nola)) {
-    # Create the new variable
-    df_temp_data_nola[[new_var]] <- ifelse(df_temp_data_nola[[heat_var]] >= df_temp_data_nola[[var]], 1, 0)
-  } else {
-    warning(paste("Variable", var, "not found in df_temp_data_nola"))
-  }
+  # Create the new variable
+  df_temp_data_nola[[new_var]] <- ifelse(df_temp_data_nola[[heat_var]] >= df_temp_data_nola[[var]], 1, 0)
 }
-
 colnames(df_temp_data_nola)
 
 ## For absolute values
@@ -150,6 +114,6 @@ df_temp_data_nola |> select(starts_with("abs_hd")) |> summary()
 df_temp_data_nola |> select(starts_with("rel_hw")) |> summary()
 
 # Save Work
-write_fst(df_temp_data_nola, path = here(path_processed_data, "2.4-clim-vars-wbgt.fst"))
+write_fst(df_temp_data_nola, path = here(path_processed_data, "2.3-clim-vars-tmax.fst"))
 
 colnames(df_temp_data_nola)

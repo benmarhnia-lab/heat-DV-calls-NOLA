@@ -7,7 +7,7 @@ path_processed <- here("data", "processed-data")
 
 # Read data ----
 ## Climate data ----- 
-df_climate_tmax <- read_fst(here(path_processed, "2.4-clim-vars-wbgt.fst"), as.data.table = TRUE)
+df_climate_tmax <- read_fst(here(path_processed, "2.6-clim-vars-wbgt.fst"), as.data.table = TRUE)
 ## NOPD - DV calls data -----
 df_dv_agg <- read_fst(here(path_processed, "1.4-DV-cases-agg.fst"), as.data.table = TRUE)
 
@@ -23,7 +23,7 @@ df_nopd_tmax_merged <- df_dv_agg |> left_join(df_climate_tmax,
 # Create a variable to identify DV cases -----
 df_nopd_tmax_merged <- df_nopd_tmax_merged |> 
   mutate(
-    dv_case = ifelse(format(case_date, "%Y-%m-%d") == format(date, "%Y-%m-%d"), 1, 0)
+    dv_case = ifelse(format(case_date, "%Y-%m-%d") == format(date.y, "%Y-%m-%d"), 1, 0)
   )
 
 # Check the data -------

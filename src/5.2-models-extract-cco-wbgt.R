@@ -12,7 +12,7 @@ if (!dir.exists(path_out)) {
 
 # Load models ----
 path_processed <- here("data", "processed-data")
-model_outputs <- readRDS(here(path_processed, "4.3-models-cco-wbgt.rds"))
+model_outputs <- readRDS(here(path_processed, "4.2-models-cco-wbgt.rds"))
 print("finished loading models")
 names(model_outputs)
 
@@ -67,7 +67,7 @@ for(model_name in names(tidy_outputs)) {
   # Extract the 2nd row and the 3rd, 4th, 8th and 9th column from the current model
   exposure <- model_name
   print(exposure)
-  estimates <- round(model[c(2,6,7)], 2)
+  estimates <- round(model[c(2,3,6,7)], 2)
   
   # Combine the exposure and the estimates
   second_row <- cbind(exposure, estimates)

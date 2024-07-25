@@ -51,8 +51,7 @@ df_nola_zip_temp <- df_nola_zip_temp |>
 head(df_nola_zip_temp)
 
 # Save file
-write_fst(df_nola_zip_temp, here(path_processed_data, "2.3_nola_wbgt_zip_code.fst"))
+write_fst(df_nola_zip_temp, here(path_processed_data, "2.4_nola_wbgt_zip_code.fst"))
 
 # df_nola_zip_temp <- read_fst(here(path_processed_data, "2.3_nola_wbgt_zip_code.fst"), as.data.table = TRUE)
 
-# Diagnostic

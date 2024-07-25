@@ -24,10 +24,16 @@ nrow(df_full_models)
 
 # Data Processing ------
 
+## Calculate CIs using SE ----
+df_full_models <- df_full_models |>
+                    mutate(conf.low.se = estimate - 1.96*std.error, conf.high.se = estimate + 1.96*std.error) 
+
+head(df_full_models)
+
 ## Select relevant rows ----
 df_full_models <- df_full_models |>  
                             filter(!str_detect(exposure, "zip_only"))
-nrow(df_full_models_final)
+nrow(df_full_models)
 
 ## Create Labels ----
 ### For duration

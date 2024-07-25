@@ -7,7 +7,7 @@ pacman::p_load(doParallel)
 path_processed <- here("data", "processed-data")
 
 # Read Data ----
-df_cco_tmax <- read_fst(here(path_processed, "3.3-cco-data-heat-index.fst"), as.data.table = TRUE)
+df_cco_tmax <- read_fst(here(path_processed, "3.2-cco-data-wbgt.fst"), as.data.table = TRUE)
 
 
 # List of exposure variables ----
@@ -43,6 +43,6 @@ names(models_first_set) <- varlist_exp_all
 all_model_outputs <- models_first_set
 
 # Save the list as an RDS object
-saveRDS(all_model_outputs, here(path_processed, "4.5-models-cco-heat-index.rds"))
+saveRDS(all_model_outputs, here(path_processed, "4.2-models-cco-wbgt.rds"))
 print("Finished saving all models")
 print(Sys.time())
