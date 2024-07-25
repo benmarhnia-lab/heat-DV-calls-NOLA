@@ -5,12 +5,11 @@ pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom
 # Constants ----
 path_processed_data <- here("data", "processed-data")
 heat_var <- "tmax"
-vec_cutoffs_abs <- c(29, 31, 33)
-vec_cutoffs_perc <- c(0.85, 0.90, 0.95)
+vec_cutoffs_abs <- c(28, 30, 32)
 vec_duration <- c(2, 3, 4, 5)
 
 # Read data ----
-df_temp_data_nola <- read_fst(here(path_processed_data, "2.2_nola_tmax_zip_cutoffs_added_90.fst"), as.data.table = TRUE)
+df_temp_data_nola <- read_fst(here(path_processed_data, "2.2_nola_tmax_zip_cutoffs_added.fst"), as.data.table = TRUE)
 # head(df_temp_data_nola)
 # min(df_temp_data_nola$date)
 # max(df_temp_data_nola$date)

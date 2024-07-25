@@ -3,10 +3,10 @@
 func_plot_full_model <- function(df_plot, title = "Here goes the title") {
     plot <- ggplot(df_plot, aes(x = estimate, y = duration_label)) +
         geom_point() +
-        facet_wrap(~threshold_label, ncol = 1) +
+        # facet_wrap(~threshold_label, ncol = 1) +
         geom_vline(xintercept = 1, colour = "black", linetype = "dashed") +
         geom_text(aes(label = sprintf("%.2f", estimate)), vjust = -1.5, hjust = 0.5, size = 3.5) +
-        geom_pointrange(aes(xmin = conf.low.se, xmax = conf.high.se)) +
+        geom_pointrange(aes(xmin = conf.low, xmax = conf.high)) +
         labs(
             x = "Adjusted Odds Ratio [95% CI]",
             y = "Heatwave Duration",

@@ -23,7 +23,7 @@ df_nopd_tmax_merged <- df_dv_agg |> left_join(df_climate_tmax,
 # Create a variable to identify DV cases -----
 df_nopd_tmax_merged <- df_nopd_tmax_merged |> 
   mutate(
-    dv_case = ifelse(format(case_date, "%Y-%m-%d") == format(date.y, "%Y-%m-%d"), 1, 0)
+    dv_case = ifelse(format(case_date, "%Y-%m-%d") == format(date, "%Y-%m-%d"), 1, 0)
   )
 
 # Check the data -------

@@ -2,17 +2,18 @@
 rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
 pacman::p_load(parallel, doParallel, foreach)
+library(climExposuR)
 
 # Constants ----
 path_processed_data <- here("data", "processed-data")
-source(here("src", "8.4-function-to-est-perc-cutoff-rolling.R"))
+
 heat_var <- "wbgt_max"
-vec_cutoffs_abs <- c(23, 25, 27)
-vec_cutoffs_perc <- c(0.85, 0.90, 0.95)
+vec_cutoffs_abs <- c(24, 26, 28)
+
 vec_duration <- c(2, 3, 4, 5)
 
 # Read data ----
-df_temp_data_nola <- read_fst(here(path_processed_data, "2.5_nola_wbgt_zip_cutoffs_added_90.fst"), as.data.table = TRUE)
+df_temp_data_nola <- read_fst(here(path_processed_data, "2.5_nola_wbgt_zip_cutoffs_added.fst"), as.data.table = TRUE)
 head(df_temp_data_nola)
 sum(is.na(df_temp_data_nola$wbgt_max))
 # min(df_temp_data_nola$date)
