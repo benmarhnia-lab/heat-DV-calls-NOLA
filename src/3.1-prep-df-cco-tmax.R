@@ -11,6 +11,12 @@ df_climate_tmax <- read_fst(here(path_processed, "2.3-clim-vars-tmax.fst"), as.d
 ## NOPD - DV calls data -----
 df_dv_agg <- read_fst(here(path_processed, "1.4-DV-cases-agg.fst"), as.data.table = TRUE)
 
+## Remove cases where the number of cases in a Zip code is less than 50 ----
+df_dv_agg <- df_dv_agg |> 
+  group_by(Zip) |>
+  filter(n() >= 50) |>
+  ungroup()
+
 
 # View(df_dv_agg |> filter(Zip == 70117))
 
@@ -30,22 +36,23 @@ df_nopd_tmax_merged <- df_nopd_tmax_merged |>
 # View((df_nopd_tmax_merged |> filter(Zip == 70117) |> select(dv_case, Zip, date, case_date, year, month, weekday, tmax)))
 
 ## Inspect missing temperature cases
-nrow(df_nopd_tmax_merged) # 264,383
-sum(is.na(df_nopd_tmax_merged$tmax)) # 3 cases
-df_test <- df_nopd_tmax_merged[is.na(tmax)]
-unique(df_test$Zip)
+# nrow(df_nopd_tmax_merged) # 264,145
+# sum(is.na(df_nopd_tmax_merged$tmax)) # 0 cases
+# colnames(df_nopd_tmax_merged) # 264,145
+# df_test <- df_nopd_tmax_merged |> filter(is.na(tmax))
+# unique(df_test$Zip)
 
-#' 70118 and 70133, 70144 zip codes are missing. 
-#' Look for these in the climate data
-df_climate_tmax |> filter(Zip == 70188) 
-df_climate_tmax |> filter(Zip == 70133) 
-df_climate_tmax |> filter(Zip == 70144) 
+# #' 70118 and 70133, 70144 zip codes are missing. 
+# #' Look for these in the climate data
+# df_climate_tmax |> filter(Zip == 70188) 
+# df_climate_tmax |> filter(Zip == 70133) 
+# df_climate_tmax |> filter(Zip == 70144) 
 
-#' these cases are missing in the climate data as well
+# #' these cases are missing in the climate data as well
 
-## Drop the missing cases ----
-df_nopd_tmax_merged <- df_nopd_tmax_merged |> filter(!is.na(tmax))
-nrow(df_nopd_tmax_merged) # 264380
+# ## Drop the missing cases ----
+# df_nopd_tmax_merged <- df_nopd_tmax_merged |> filter(!is.na(tmax))
+# nrow(df_nopd_tmax_merged) # 264380
 
 # Save the data ----
 write_fst(df_nopd_tmax_merged, here(path_processed, "3.1-cco-data-tmax.fst"))

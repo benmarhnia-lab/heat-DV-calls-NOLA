@@ -46,3 +46,9 @@ all_model_outputs <- models_first_set
 saveRDS(all_model_outputs, here(path_processed, "4.1-models-cco-tmax.rds"))
 print("Finished saving all models")
 print(Sys.time())
+
+
+# Example of one model
+# library(survival)
+# model <- survival::clogit(dv_case ~ abs_hd_28 + strata(ID_grp), weights = DV_count, data = df_cco_tmax, method = "approximate")
+# summary(model)

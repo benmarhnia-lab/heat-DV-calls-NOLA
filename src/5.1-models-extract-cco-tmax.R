@@ -17,6 +17,7 @@ model_outputs <- readRDS(here(path_processed, "4.1-models-cco-tmax.rds"))
 print("finished loading models")
 names(model_outputs)
 
+
 # Step-1: Extract Tidy Outputs  ----
 
 ## Initialize an empty list to store tidy outputs

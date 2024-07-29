@@ -4,6 +4,7 @@
 rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
 pacman::p_load(sf, sp, terra, tidyterra, ncdf4, tigris)
+library(climExposuR)
 
 # Step-1: Read Shape file for NOLA zip codes ---- 
 ## Get the shape file of zip codes using tigris
@@ -28,13 +29,13 @@ class(zctas_nola_nopd)
 length(unique(zctas_nola_nopd$Zip)) # 16 zip codes
 
 # Load the function
-path_function <- here("src", "8.2-function-to-extract-climate-data-multiple-nic-files.R")
+# path_function <- here("src", "8.2-function-to-extract-climate-data-multiple-nic-files.R")
 source(path_function)
 
 # Extract temperature data for NOLA zip codes ----
 path_wbgt_data <- here("data", "raw-data", "wbgt-ecmwf") 
 # path_wbgt_data <- ("Z:/Shared drives/Benmarhnia Lab/Arnab/common-datasets/climate-datasets/world-temp-wetbulb-max/")
-df_nola_zip_temp <- func_extract_clim_data_shp(path_nic_files = path_wbgt_data, 
+df_nola_zip_temp <- func_extract_clim_data_shp2(path_nic_files = path_wbgt_data, 
                                  sf_file = zctas_nola_nopd, 
                                  sf_file_admin = "Zip")
 

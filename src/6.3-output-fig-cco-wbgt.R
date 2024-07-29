@@ -74,10 +74,10 @@ df_full_models$duration_label <- fct_reorder(df_full_models$duration_label, desc
 ## For absolute ----
 df_full_models_abs <- df_full_models |> filter(str_detect(exposure, "abs"))
 nrow(df_full_models_abs)
-head(df_full_models_abs)
+# head(df_full_models_abs)
 
 plot_abs <- func_plot_full_model(df_full_models_abs, title = "WBGT >= 24 °C")
-ggsave(here(path_out, "plot_abs.jpeg"), plot_abs, width = 8, height = 10, dpi = 600)
+ggsave(here(path_out, "plot_abs.jpeg"), plot_abs, width = 6, height = 6, dpi = 600)
 
 
 ## For percentile ----
@@ -86,4 +86,5 @@ nrow(df_full_models_perc)
 head(df_full_models_perc)
 
 plot_perc <- func_plot_full_model(df_full_models_perc, title = "WBGT >= 95th Percentile")
-ggsave(here(path_out, "plot_perc.jpeg"), plot_perc, width = 8, height = 10, dpi = 600)
+ggsave(here(path_out, "plot_perc.jpeg"), plot_perc, width = 6, height = 6, dpi = 600)
+
