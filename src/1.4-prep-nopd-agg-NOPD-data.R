@@ -36,14 +36,13 @@ nrow(df_dv_cases_agg) # 60083
 length(unique(df_dv_cases_agg$Zip)) # 29
 # View(head(df_dv_cases_agg))
 
-# Drop Zip codes with less than 50 cases
-## Identify Zip codes with less than 50 cases
-# df_zip_counts <- df_dv_cases_agg[, .(DV_count = sum(DV_count)), by = Zip]
-# df_zip_counts_less_50 <- df_zip_counts |> filter(DV_count < 50) |> pull(Zip)
+# Drop Zip codes with less than 50 cases ---
+df_dv_cases_agg <- df_dv_cases_agg |> 
+  group_by(Zip) |>
+  filter(n() >= 50) |>
+  ungroup()
+nrow(df_dv_cases_agg) # 60028
 
-# ## Filter cases from the aggregated data
-# df_dv_cases_agg <- df_dv_cases_agg |> filter(!Zip %in% df_zip_counts_less_50)
-# nrow(df_dv_cases_agg) # 60028
 
 # Save file ----
 write_fst(df_dv_cases_agg, here(path_processed_data, "1.4-DV-cases-agg.fst"))

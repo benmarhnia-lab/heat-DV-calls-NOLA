@@ -50,5 +50,15 @@ print(Sys.time())
 
 # Example of one model
 # library(survival)
-# model <- survival::clogit(dv_case ~ abs_hd_28 + strata(ID_grp), weights = DV_count, data = df_cco_tmax, method = "approximate")
+model <- survival::clogit(dv_case ~ abs_hd_24 + strata(ID_grp), weights = DV_count, data = df_cco_tmax, method = "approximate")
+
+install.packages("gnm")
+library(gnm)
+??ns
+model_cpoisson <- gnm(dv_case~abs_hd_32,
+                  data=df_cco_tmax, 
+                  family=quasipoisson(),
+                  eliminate=factor(ID_grp))
+summary(model_cpoisson) 
+
 # summary(model)

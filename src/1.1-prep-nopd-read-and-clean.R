@@ -68,3 +68,4 @@ nrow(type_text)
 ## Save outputs
 write.xlsx(type_text, here(path_processed_data, "1.1-nopd-call-type-categories.xlsx"), 
   sheetName = "call_type_categories")
+

@@ -9,7 +9,6 @@ path_processed <- here("data", "processed-data")
 # Read Data ----
 df_cco_tmax <- read_fst(here(path_processed, "3.2-cco-data-wbgt.fst"), as.data.table = TRUE)
 
-
 # List of exposure variables ----
 colnames(df_cco_tmax)
 ## List all variables that start with "hd" or "hw"
