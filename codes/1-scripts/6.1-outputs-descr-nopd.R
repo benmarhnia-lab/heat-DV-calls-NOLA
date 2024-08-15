@@ -1,16 +1,14 @@
 # Library
 rm(list = ls())
-library(tidyverse)
-library(fst)
-library(data.table)
-library(janitor)
-library(here)
+pacman::p_load(dplyr, janitor, data.table, fst, openxlsx, here, googledrive)
+source(here(".Rprofile"))
 
 # Read data ----
 ## NOPD - DV calls data -----
-df_nopd_vars_crtd <- read_fst("D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/data/processed-data/nopd_calls_comb_vars_crtd.fst")
+df_nopd_vars_crtd <- read_fst(here(path_project, "processed-data", "nopd_calls_comb_vars_crtd.fst"))
 
 ## DV aggregated data -----
+path_processed <- here(path_project, "processed-data")
 df_dv_agg <- read_fst(here(path_processed, "1.4-DV-cases-agg.fst"), as.data.table = TRUE)
 
 
@@ -23,7 +21,7 @@ tab_1 <- df_nopd_vars_crtd |>
             adorn_ns(position = "front") |>
             adorn_title("top")
 
-# write.csv(tab_1, "D:/Arnab/git/manuscripts/pap-nola-climate-domestic-violence/outputs/dv_calls_over_years.csv", row.names = FALSE)
+# write.csv(tab_1, here(path_project, "outputs", "dv_calls_over_years.csv"), row.names = FALSE)
 
 # Plot number of DV cases across months -----
 colnames(df_dv_agg)

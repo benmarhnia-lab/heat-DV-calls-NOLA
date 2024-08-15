@@ -4,10 +4,11 @@
 # Load packages ----
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
 rm(list = ls())
+source(here(".Rprofile"))
 
 # Read data
 ## Read raw-dv data
-path_processed_data <- here("data", "processed-data")
+path_processed_data <- here(path_project, "processed-data")
 df_nopd_dv_cases_all <- read_fst(here(path_processed_data, "1.1b-nopd-calls-raw-dv-only.fst"), as.data.table = TRUE)
 nrow(df_nopd_dv_cases_all) # 167,042 cases
 
@@ -22,7 +23,7 @@ nrow(df_complete_zip)
 nrow(df_nopd_dv_cases_all) - nrow(df_missing_zip) 
 
 ## Read filled zip data ----
-df_filled_zip_edwin_namratha <- read.csv(here("data", "raw-data", "nopd-missing-zips-filled-by-Edwin-Namratha.csv"), stringsAsFactors = FALSE)
+df_filled_zip_edwin_namratha <- read.csv(here(path_project, "raw-data", "nopd-missing-zips-filled-by-Edwin-Namratha.csv"), stringsAsFactors = FALSE)
 nrow(df_filled_zip_edwin_namratha)
 df_filled_zip_edwin_namratha <- df_filled_zip_edwin_namratha |> select(uid, Zip)
 length(unique(df_filled_zip_edwin_namratha$uid))

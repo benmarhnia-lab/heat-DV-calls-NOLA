@@ -6,11 +6,11 @@
 # Load Libraries
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
 # drive_auth()
+source(here(".Rprofile"))
 
 # Step-1: Read and Process NOPD DV calls data
 ## Point to the path where the NOPD calls are stored
-path_grive_temp_nopd <- here("data", "raw-data", "nopd-calls-csvs")
-
+path_grive_temp_nopd <- here(path_project, "raw-data", "nopd-calls-csvs")
 ## List all CSV files in the directory
 file_list <- list.files(path_grive_temp_nopd, pattern = "\\.csv$")
 
@@ -38,9 +38,10 @@ combined_df <- combined_df %>%
     dplyr::select(uid, everything())
 
 ## Save work for Step-1
-path_processed_data <- here("data", "processed-data")
-if (!dir.exists(path_processed_data)) {dir.create(path_processed_data, recursive = TRUE)}
+path_processed_data <- here(path_project, "processed-data")
 write_fst(combined_df, here(path_processed_data, "1.1a-nopd-calls-raw-all.fst"))
+
+df_all <- read_fst(here(path_processed_data, "1.1a-nopd-calls-raw-all-cases.fst"))
 
 # Step-2: Subset data to retain DV cases only
 ## List of call types that may be Domestic Violence related

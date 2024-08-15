@@ -2,25 +2,22 @@ rm(list =ls())
 options(scipen=999)
 options(digits=5)
 pacman::p_load(tidyverse, ggpubr, ggplot2, sjPlot, readxl, here, extrafont, ggbreak, patchwork)
-
+source(here(".Rprofile"))
 
 # font_import() # run only once
 # loadfonts(device="win") # run only once
 
 # Load data ----
-here_output_files <- here("outputs", "models", "models-cco-wbgt")
-df_full_models <- read.csv(here(here_output_files, "models_consolidated_cco_wbgt.csv"))
+here_output_files <- here(path_project, "outputs", "models", "models-cco-tmax")
+df_full_models <- read.csv(here(here_output_files, "models_consolidated_cco_tmax.csv"))
 dim(df_full_models)
 
 # Constants ---------------
 ## Call the function to plot ----
-source(here("src", "8.5-function-to-plot-models-and-effect-modifiers.R"))
-## Path for outputs ----
-path_out <- here("outputs", "figures", "cco-wbgt")
-!dir.exists(path_out) && dir.create(path_out, recursive = TRUE)
+source(here("codes", "2-helper-functions", "function-to-plot-models-and-effect-modifiers.R"))
 
-unique(df_full_models$exposure)
-nrow(df_full_models)
+## Path for outputs ----
+path_out <- here(path_project, "outputs", "figures", "cco-tmax")
 
 # Data Processing ------
 
@@ -32,8 +29,8 @@ head(df_full_models)
 
 ## Select relevant rows ----
 nrow(df_full_models)
-df_full_models <- df_full_models |>  filter(str_detect(exposure, "rolling") * str_detect(exposure, "95") | 
-                                           str_detect(exposure, "abs") * str_detect(exposure, "24"))
+df_full_models <- df_full_models |>  filter(str_detect(exposure, "rolling") * str_detect(exposure, "90") | 
+                                           str_detect(exposure, "abs") * str_detect(exposure, "30"))
 nrow(df_full_models)
 # View(df_full_models)
 unique(df_full_models$exposure)
@@ -74,10 +71,10 @@ df_full_models$duration_label <- fct_reorder(df_full_models$duration_label, desc
 ## For absolute ----
 df_full_models_abs <- df_full_models |> filter(str_detect(exposure, "abs"))
 nrow(df_full_models_abs)
-# head(df_full_models_abs)
+head(df_full_models_abs)
 
-plot_abs <- func_plot_full_model(df_full_models_abs, title = "WBGT >= 24 °C")
-ggsave(here(path_out, "plot_abs.jpeg"), plot_abs, width = 6, height = 6, dpi = 600)
+plot_abs <- func_plot_full_model(df_full_models_abs, title = "Absolute temperature >= 30 °C")
+ggsave(here(path_out, "plot_abs.jpeg"), plot_abs, width = 8, height = 10, dpi = 600)
 
 
 ## For percentile ----
@@ -85,6 +82,5 @@ df_full_models_perc <- df_full_models |> filter(str_detect(exposure, "rel"))
 nrow(df_full_models_perc)
 head(df_full_models_perc)
 
-plot_perc <- func_plot_full_model(df_full_models_perc, title = "WBGT >= 95th Percentile")
-ggsave(here(path_out, "plot_perc.jpeg"), plot_perc, width = 6, height = 6, dpi = 600)
-
+plot_perc <- func_plot_full_model(df_full_models_perc, title = "Temperature >= 90th Percentile")
+ggsave(here(path_out, "plot_perc.jpeg"), plot_perc, width = 8, height = 10, dpi = 600)

@@ -1,9 +1,10 @@
 # Load packages ----
 rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
+source(here(".Rprofile"))
 
 # constants ----
-path_processed <- here("data", "processed-data")
+path_processed <- here(path_project, "processed-data")
 
 # Read data ----
 ## Climate data -----
@@ -12,7 +13,6 @@ df_climate_wbgt <- read_fst(here(path_processed, "2.6-clim-vars-wbgt.fst"), as.d
 ### Check for missing values ----
 sum(is.na(df_climate_wbgt$wbgt_max)) # 0 cases
 head(df_climate_wbgt)
-
 
 ## NOPD - DV calls data -----
 df_dv_agg <- read_fst(here(path_processed, "1.4-DV-cases-agg.fst"), as.data.table = TRUE)

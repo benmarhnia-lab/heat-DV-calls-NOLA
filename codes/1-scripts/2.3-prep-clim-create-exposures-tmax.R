@@ -1,9 +1,10 @@
 # Libraries ----
 rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
+source(here(".Rprofile"))
 
 # Constants ----
-path_processed_data <- here("data", "processed-data")
+path_processed_data <- here(path_project, "processed-data")
 heat_var <- "tmax"
 vec_cutoffs_abs <- c(28, 30, 32)
 vec_duration <- c(2, 3, 4, 5)

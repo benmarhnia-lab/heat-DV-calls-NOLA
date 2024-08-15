@@ -1,17 +1,18 @@
 # Library ----
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
 library(performance)
+source(here(".Rprofile"))
 rm(list = ls())
 
 # Create a folder for the outputs ----
-path_out <- here("outputs", "models", "models-cco-tmax")
+path_out <- here(path_project, "outputs", "models", "models-cco-tmax")
 if (!dir.exists(path_out)) {
   # Create the directory if it does not exist
   dir.create(path_out, showWarnings = TRUE, recursive = TRUE)
 }
 
 # Load models ----
-path_processed <- here("data", "processed-data")
+path_processed <- here(path_project, "processed-data")
 model_outputs <- readRDS(here(path_processed, "4.1-models-cco-tmax.rds"))
 
 print("finished loading models")

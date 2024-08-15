@@ -3,13 +3,13 @@ rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
 pacman::p_load(parallel, doParallel, foreach)
 library(climExposuR)
+source(here(".Rprofile"))
 
 # Constants ----
-path_processed_data <- here("data", "processed-data")
+path_processed_data <- here(path_project, "processed-data")
 
 heat_var <- "wbgt_max"
 vec_cutoffs_abs <- c(24, 26, 28)
-
 vec_duration <- c(2, 3, 4, 5)
 
 # Read data ----
@@ -130,4 +130,3 @@ df_temp_data_nola |> select(starts_with("rel_hw")) |> summary()
 # Save Work
 write_fst(df_temp_data_nola, path = here(path_processed_data, "2.6-clim-vars-wbgt.fst"))
 
-colnames(df_temp_data_nola)

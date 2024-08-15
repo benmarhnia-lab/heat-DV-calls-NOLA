@@ -1,16 +1,16 @@
 # Load packages ---- 
 rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
+source(here(".Rprofile"))
 
 # constants ----
-path_processed <- here("data", "processed-data")
+path_processed <- here(path_project, "processed-data")
 
 # Read data ----
 ## Climate data ----- 
 df_climate_tmax <- read_fst(here(path_processed, "2.3-clim-vars-tmax.fst"), as.data.table = TRUE)
 ## NOPD - DV calls data -----
 df_dv_agg <- read_fst(here(path_processed, "1.4-DV-cases-agg.fst"), as.data.table = TRUE)
-
 
 # View(df_dv_agg |> filter(Zip == 70117))
 

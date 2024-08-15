@@ -5,9 +5,10 @@
 # Load packages ----
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
 rm(list = ls())
+source(here(".Rprofile"))
 
 # Read raw-dv data
-path_processed_data <- here("data", "processed-data")
+path_processed_data <- here(path_project, "processed-data")
 df_nopd_dv_cases <- read_fst(here(path_processed_data, "1.1b-nopd-calls-raw-dv-only.fst"), as.data.table = TRUE)
 nrow(df_nopd_dv_cases) # 167,042 cases
 
