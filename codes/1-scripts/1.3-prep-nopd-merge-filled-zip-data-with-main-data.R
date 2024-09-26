@@ -2,9 +2,9 @@
 #' The filled data was provided by Edwin and Namratha.
 
 # Load packages ----
-pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
 rm(list = ls())
-source(here(".Rprofile"))
+pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
+source("paths-mac.R")
 
 # Read data
 ## Read raw-dv data

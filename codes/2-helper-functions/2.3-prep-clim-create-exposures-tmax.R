@@ -1,7 +1,7 @@
 # Libraries ----
 rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
-source(here(".Rprofile"))
+source("paths-mac.R")
 
 # Constants ----
 path_processed_data <- here(path_project, "processed-data")
@@ -11,7 +11,7 @@ vec_duration <- c(2, 3, 4, 5)
 
 # Read data ----
 df_temp_data_nola <- read_fst(here(path_processed_data, "2.2_nola_tmax_zip_cutoffs_added.fst"), as.data.table = TRUE)
-# head(df_temp_data_nola)
+# View(df_temp_data_nola)
 # min(df_temp_data_nola$date)
 # max(df_temp_data_nola$date)
 
@@ -56,8 +56,13 @@ for (val in vec_cutoffs_abs) {
 }
 colnames(df_temp_data_nola)
 
+# View(df_temp_data_nola)
+
 
 # Create variables for consecutive days ----
+
+## Sort the data by date and Zip
+setorder(df_temp_data_nola, Zip, date)
 
 ## Identify all variables that start with "hotday"
 vec_hotday_vars <- colnames(df_temp_data_nola)[grepl("rel_hd|abs_hd", colnames(df_temp_data_nola))]
@@ -74,7 +79,7 @@ for (var in vec_hotday_vars) {
   cat("Processing:", var, "->", new_var, "\n")
   
   # Create the new variable
-  df_temp_data_nola[, (new_var) := fifelse(get(var) == 1, seq_len(.N), 0L), by = rleid(get(var))]
+  df_temp_data_nola[, (new_var) := fifelse(get(var) == 1, seq_len(.N), 0L), by = .(Zip, rleid(get(var)))]
   
   # Confirm creation
   if (new_var %in% names(df_temp_data_nola)) {

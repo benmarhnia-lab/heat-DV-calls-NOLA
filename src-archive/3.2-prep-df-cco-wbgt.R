@@ -1,7 +1,7 @@
 # Load packages ----
 rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
-source(here(".Rprofile"))
+source("paths-mac.R")
 
 # constants ----
 path_processed <- here(path_project, "processed-data")

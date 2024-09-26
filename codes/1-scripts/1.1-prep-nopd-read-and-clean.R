@@ -6,7 +6,7 @@
 # Load Libraries
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
 # drive_auth()
-source(here(".Rprofile"))
+pacman::p_load(dplyr, janitor, data.table, fst, openxlsx, here, googledrive)
 
 # Step-1: Read and Process NOPD DV calls data
 ## Point to the path where the NOPD calls are stored

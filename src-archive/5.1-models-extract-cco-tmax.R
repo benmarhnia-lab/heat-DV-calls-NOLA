@@ -1,8 +1,8 @@
 # Library ----
+rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
 library(performance)
-source(here(".Rprofile"))
-rm(list = ls())
+source("paths-mac.R")
 
 # Create a folder for the outputs ----
 path_out <- here(path_project, "outputs", "models", "models-cco-tmax")
@@ -82,4 +82,3 @@ for(model_name in names(tidy_outputs)) {
 head(combined_exposures)
 ## Save Step-2  output to a CSV ----
 write.csv(combined_exposures, here(path_out, "models_consolidated_cco_tmax.csv"), row.names = FALSE)
-

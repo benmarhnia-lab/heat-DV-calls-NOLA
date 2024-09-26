@@ -2,14 +2,13 @@
 rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here, survival)
 pacman::p_load(doParallel)
-source(here(".Rprofile"))
+source("paths-mac.R")
 
 # Constants ----
 path_processed <- here(path_project, "processed-data")
 
 # Read Data ----
-df_cco_tmax <- read_fst(here(path_processed, "3.1-cco-data-tmax.fst"), as.data.table = TRUE)
-
+df_cco_tmax <- read_fst(here(path_processed, "3.2-cco-data-wbgt.fst"), as.data.table = TRUE)
 
 # List of exposure variables ----
 colnames(df_cco_tmax)
@@ -44,12 +43,6 @@ names(models_first_set) <- varlist_exp_all
 all_model_outputs <- models_first_set
 
 # Save the list as an RDS object
-saveRDS(all_model_outputs, here(path_processed, "4.1-models-cco-tmax.rds"))
+saveRDS(all_model_outputs, here(path_processed, "4.2-models-cco-wbgt.rds"))
 print("Finished saving all models")
 print(Sys.time())
-
-
-# Example of one model
-# library(survival)
-# model <- survival::clogit(dv_case ~ abs_hd_24 + strata(ID_grp), weights = DV_count, data = df_cco_tmax, method = "approximate")
-# summary(model)

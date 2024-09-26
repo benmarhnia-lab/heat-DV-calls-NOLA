@@ -2,7 +2,7 @@
 rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
 library(performance)
-source(here(".Rprofile"))
+source("paths-mac.R")
 
 # Create a folder for the outputs ----
 path_out <- here(path_project, "outputs", "models", "models-cco-wbgt")
@@ -12,7 +12,7 @@ if (!dir.exists(path_out)) {
 }
 
 # Load models ----
-path_processed <- here(path_project, "data", "processed-data")
+path_processed <- here(path_project, "processed-data")
 model_outputs <- readRDS(here(path_processed, "4.2-models-cco-wbgt.rds"))
 print("finished loading models")
 names(model_outputs)

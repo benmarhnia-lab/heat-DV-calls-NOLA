@@ -5,14 +5,18 @@ func_plot_full_model <- function(df_plot, title = "Here goes the title") {
         geom_pointrange(aes(xmin = conf.low.se, xmax = conf.high.se), 
                         color = "#fa9fb5", linewidth = 1.5, alpha = 0.5) +
         geom_point(color = "#dd1c77", size = 1.8, alpha = 0.8) +
-        geom_vline(xintercept = 1, colour = "black", linetype = "dashed", linewidth = 1.2) +
+        geom_vline(xintercept = 1, colour = "black", linetype = "dashed", linewidth = 0.5) +
         geom_text(aes(label = sprintf("%.2f", estimate)), vjust = -1.5, hjust = 0.5, size = 3.5) +
         labs(
-            x = "Adjusted Odds Ratio [95% CI]",
+            x = "Odds Ratio and 95% CI (log scale)",
             y = "Heatwave Duration",
             title = title
         ) +
-        scale_x_continuous(limits = c(0.9, 1.2)) +
+        scale_x_log10(
+            # breaks = c(0.8, 1, 1.25, 1.5, 2),
+            # labels = scales::label_number(accuracy = 0.1),
+            # limits = c(0.8, 1.4)
+        ) +
         theme_classic(base_size = 12, base_family = "Times New Roman") +
         theme(
             panel.grid.major = element_line(linewidth=0.25), 

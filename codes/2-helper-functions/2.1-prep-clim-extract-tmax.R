@@ -6,7 +6,7 @@ pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
 pacman::p_load(sf, sp, terra, tidyterra, ncdf4, tigris)
 devtools::install_github("axdey/climExposuR")
 library(climExposuR)
-source(here(".Rprofile"))
+source("paths-mac.R")
 
 # Step-1: Read Shape file for NOLA zip codes ---- 
 

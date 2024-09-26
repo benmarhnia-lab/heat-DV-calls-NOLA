@@ -1,7 +1,7 @@
 # Library
 rm(list = ls())
 pacman::p_load(dplyr, janitor, data.table, fst, openxlsx, here, googledrive)
-source(here(".Rprofile"))
+source("paths-mac.R")
 
 # Read data ----
 ## NOPD - DV calls data -----

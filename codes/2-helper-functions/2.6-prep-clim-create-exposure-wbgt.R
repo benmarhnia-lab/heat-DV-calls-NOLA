@@ -3,7 +3,7 @@ rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
 pacman::p_load(parallel, doParallel, foreach)
 library(climExposuR)
-source(here(".Rprofile"))
+source("paths-mac.R")
 
 # Constants ----
 path_processed_data <- here(path_project, "processed-data")
@@ -70,8 +70,10 @@ for (val in vec_cutoffs_abs) {
 }
 colnames(df_temp_data_nola)
 
-
 # Create variables for consecutive days ----
+
+## Sort the data by date and Zip
+setorder(df_temp_data_nola, Zip, date)
 
 ## Identify all variables that start with "hotday"
 vec_hotday_vars <- colnames(df_temp_data_nola)[grepl("rel_hd|abs_hd", colnames(df_temp_data_nola))]
@@ -88,7 +90,7 @@ for (var in vec_hotday_vars) {
   cat("Processing:", var, "->", new_var, "\n")
   
   # Create the new variable
-  df_temp_data_nola[, (new_var) := fifelse(get(var) == 1, seq_len(.N), 0L), by = rleid(get(var))]
+  df_temp_data_nola[, (new_var) := fifelse(get(var) == 1, seq_len(.N), 0L), by = .(Zip, rleid(get(var)))]
   
   # Confirm creation
   if (new_var %in% names(df_temp_data_nola)) {

@@ -5,7 +5,7 @@
 # Load packages ----
 rm(list = ls())
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
-source(here(".Rprofile"))
+source("paths-mac.R")
 
 # Read NOPD-DV cases ---- 
 path_processed_data <- here(path_project, "processed-data")

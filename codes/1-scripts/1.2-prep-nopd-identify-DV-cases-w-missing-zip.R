@@ -5,7 +5,7 @@
 # Load packages ----
 pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
 rm(list = ls())
-source(here(".Rprofile"))
+source("paths-mac.R")
 
 # Read raw-dv data
 path_processed_data <- here(path_project, "processed-data")
