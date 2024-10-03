@@ -1,6 +1,17 @@
 # Function to plot the AORs ----
  
 func_plot_full_model <- function(df_plot, title = "Here goes the title") {
+    # Define the desired order
+    
+    all_levels <- c("Heatwave: 5 days", "Heatwave: 3 days", "Extreme heat day")
+    # desired_order <- c("Heatwave: 5 days", "Heatwave: 3 days", "Extreme heat day")
+
+    # Ensure all levels are present in the data, even if some are missing
+    # all_levels <- unique(c(desired_order, df_plot$duration_label))
+    
+    # Create a new factor with the desired order
+    df_plot$duration_label <- factor(df_plot$duration_label, levels = all_levels)
+    
     plot <- ggplot(df_plot, aes(x = estimate, y = duration_label)) +
         geom_pointrange(aes(xmin = conf.low.se, xmax = conf.high.se), 
                         color = "#fa9fb5", linewidth = 1.5, alpha = 0.5) +
@@ -12,11 +23,8 @@ func_plot_full_model <- function(df_plot, title = "Here goes the title") {
             y = "Heatwave Duration",
             title = title
         ) +
-        scale_x_log10(
-            # breaks = c(0.8, 1, 1.25, 1.5, 2),
-            # labels = scales::label_number(accuracy = 0.1),
-            # limits = c(0.8, 1.4)
-        ) +
+        scale_x_log10() +
+        scale_y_discrete(limits = rev(all_levels)) +  # Use all_levels here
         theme_classic(base_size = 12, base_family = "Times New Roman") +
         theme(
             panel.grid.major = element_line(linewidth=0.25), 

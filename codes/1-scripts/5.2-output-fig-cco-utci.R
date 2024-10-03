@@ -54,9 +54,12 @@ head(df_full_models)
 ## Set order of duration variable ----
 ## Order the levels of the Contrast variable
 ord_duration <- c("Extreme heat day", "Heatwave: 2 days", "Heatwave: 3 days", "Heatwave: 4 days", "Heatwave: 5 days")
+ord_duration <- c("Extreme heat day", "Heatwave: 2 days", "Heatwave: 3 days", "Heatwave: 4 days", "Heatwave: 5 days")
 df_full_models$duration_label <- factor(df_full_models$duration_label, levels=ord_duration)
 df_full_models$duration_label <- fct_reorder(df_full_models$duration_label, desc(df_full_models$duration_label))
 
+ord_duration <- c("Heatwave: 5 days", "Heatwave: 4 days", "Heatwave: 3 days", "Heatwave: 2 days", "Extreme heat day")
+df_full_models$duration_label <- factor(df_full_models$duration_label, levels = ord_duration)
 
 # Remove 2 day and 4 day heatwave from the plot
 df_full_models <- df_full_models |> filter(!str_detect(duration_label, "2 days")) |> filter(!str_detect(duration_label, "4 days"))
