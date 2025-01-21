@@ -25,8 +25,8 @@ zctas_nola_70 <- tigris::zctas(starts_with = c("70"))
 
 
 ## Get list of Zip codes used in the NOPD-DV ----- 
-path_processed_data <- here(path_project, "processed-data")
-df_nopd_dv_cases <- read_fst(here(path_processed_data, "1.4-DV-cases-agg.fst"), as.data.table = TRUE)
+path_project, "processed-data" <- here(path_project, "processed-data")
+df_nopd_dv_cases <- read_fst(here(path_project, "processed-data", "1.4-DV-cases-agg.fst"), as.data.table = TRUE)
 zips_nopd_dv <- unique(df_nopd_dv_cases$Zip)
 length(zips_nopd_dv) # 29 zip codes
 
@@ -80,4 +80,4 @@ df_test <- df_nola_zip_utci |>
 # View(df_test)
 
 # Save file
-write_fst(df_nola_zip_utci, here(path_processed_data, "2.1_nola_utci_zip_code.fst"))
+write_fst(df_nola_zip_utci, here(path_project, "processed-data", "2.1_nola_utci_zip_code.fst"))

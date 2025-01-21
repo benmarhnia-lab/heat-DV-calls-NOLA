@@ -1,26 +1,17 @@
-# Library ----
+# load library ----
 rm(list = ls())
-pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
+pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, here)
 library(performance)
+
+# set paths ----
 source("paths-mac.R")
 
-# Create a folder for the outputs ----
-path_out <- here(path_project, "outputs", "models", "models-cco-utci")
-if (!dir.exists(path_out)) {
-  # Create the directory if it does not exist
-  dir.create(path_out, showWarnings = TRUE, recursive = TRUE)
-}
-
-# Load models ----
-path_processed <- here(path_project, "processed-data")
-model_outputs <- readRDS(here(path_processed, "4.1-models-cco-utci.rds"))
-
+# load models ----
+model_outputs <- readRDS(here(path_project, "processed-data", "4.1-models-cco-utci_21.rds"))
 print("finished loading models")
-names(model_outputs)
 
 
 # Step-1: Extract Tidy Outputs  ----
-
 ## Initialize an empty list to store tidy outputs
 tidy_outputs <- list()
 
@@ -35,7 +26,7 @@ names_tidy_outputs <- names(tidy_outputs)
 substring <- str_sub(names_tidy_outputs, start = 1, end = 30)
 names(tidy_outputs) <- substring
 
-## Save Tidy Outputs to separate workbooks ----- 
+## Save Tidy Outputs to separate workbooks 
 ### Create a new workbook
 wb <- createWorkbook()
 ### Iterate over the tidy_outputs to add each to a new sheet in the workbook
@@ -47,15 +38,14 @@ for(exposure in names(tidy_outputs)) {
   print(paste0("finished writing", exposure))
 }
 
-## Write Step-1 output to a file
-saveWorkbook(wb, here(path_out, "models_cco_utci.xlsx"), overwrite = TRUE)
+## write Step-1 output to a file
+saveWorkbook(wb, here(path_project, "outputs", "models", "models_cco_utci_21.xlsx"), overwrite = TRUE)
 
 # Step-2: Consolidate coefficients for the primary exposure  in a single CSV ----
 ## Initialize an empty dataframe to store the estimates for the exposure
 combined_exposures <- data.frame(a = integer(), b = integer())
 
 ## Loop through each model in the list
-
 for(model_name in names(tidy_outputs)) {
   # Extract the model from the list
   model <- tidy_outputs[[model_name]]
@@ -73,5 +63,13 @@ for(model_name in names(tidy_outputs)) {
 }
 
 head(combined_exposures)
-## Save Step-2  output to a CSV ----
-write.csv(combined_exposures, here(path_out, "models_consolidated_cco_utci.csv"), row.names = FALSE)
+
+## Save Step-2  output to a CSV 
+write.csv(combined_exposures, here(path_project, "outputs", "models", "models_consolidated_cco_utci_21.csv"), row.names = FALSE)
+
+# step-3: calculate attributable fraction ----
+## For 90th percentile heatwave for 5 days
+or_hw_90_5d <- combined_exposures[which(combined_exposures$exposure == "rel_hw_rolling_90_5d"), "estimate"]
+## calculate attributable fraction among exposed
+afe <- ((or_hw_90_5d - 1) / or_hw_90_5d)*100
+afe # so 6.5% of the DV cases are attributable to heatwaves

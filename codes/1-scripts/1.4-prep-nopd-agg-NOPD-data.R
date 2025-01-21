@@ -8,8 +8,7 @@ pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
 source("paths-mac.R")
 
 # Read NOPD-DV cases ---- 
-path_processed_data <- here(path_project, "processed-data")
-df_nopd_dv_cases <- read_fst(here(path_processed_data, "1.3-nopd-calls-raw-dv-only-completed.fst"), 
+df_nopd_dv_cases <- read_fst(here(path_project, "processed-data", "1.3-nopd-calls-raw-dv-only-completed.fst"), 
     as.data.table = TRUE)
 # nrow(df_nopd_dv_cases)
 # colnames(df_nopd_dv_cases)
@@ -44,8 +43,7 @@ df_dv_cases_agg <- df_dv_cases_agg |>
   ungroup()
 nrow(df_dv_cases_agg) # 60028
 
-
 # Save file ----
-write_fst(df_dv_cases_agg, here(path_processed_data, "1.4-DV-cases-agg.fst"))
-# df_dv_cases_agg <- read_fst(here(path_processed_data, "1.4-DV-cases-agg.fst"))
-length(unique(df_dv_cases_agg$Zip)) # 29
+df_dv_cases_agg |> write_fst(here(path_project, "processed-data", "1.4-DV-cases-agg.fst"))
+# df_dv_cases_agg <- read_fst(here(path_project, "processed-data", "1.4-DV-cases-agg.fst"))
+# length(unique(df_dv_cases_agg$Zip)) # 17

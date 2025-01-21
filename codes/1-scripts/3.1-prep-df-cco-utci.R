@@ -1,14 +1,13 @@
 # Load packages ----
 rm(list = ls())
-pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
-source("paths-mac.R")
+pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, here)
 
-# constants ----
-path_processed <- here(path_project, "processed-data")
+# set paths ----
+source("paths-mac.R")
 
 # Read data ----
 ## Climate data -----
-df_climate_utci <- read_fst(here(path_processed, "2.3-clim-vars-utci.fst"), as.data.table = TRUE)
+df_climate_utci <- read_fst(here(path_project, "processed-data", "2.3-clim-vars-utci.fst"), as.data.table = TRUE)
 tabyl(df_climate_utci$rel_hd_rolling_85)
 tabyl(df_climate_utci$rel_hw_rolling_85_2d)
 tabyl(df_climate_utci$abs_hd_30)
@@ -19,7 +18,7 @@ sum(is.na(df_climate_utci)) # 0 cases
 head(df_climate_utci)
 
 ## NOPD - DV calls data -----
-df_dv_agg <- read_fst(here(path_processed, "1.4-DV-cases-agg.fst"), as.data.table = TRUE)
+df_dv_agg <- read_fst(here(path_project, "processed-data", "1.4-DV-cases-agg.fst"), as.data.table = TRUE)
 
 # View(df_dv_agg |> filter(Zip == 70117))
 
@@ -64,5 +63,4 @@ colnames(df_nopd_utci_merged)
 max(df_dv_agg$case_date, na.rm = TRUE)
 # View(df_nopd_utci_merged)
 # Save the data ----
-write_fst(df_nopd_utci_merged, here(path_processed, "3.1-cco-data-utci.fst"))
-df_nopd_utci_merged <-  read_fst(here(path_processed, "3.1-cco-data-utci.fst"), as.data.table = TRUE)
+df_nopd_utci_merged |> write_fst(here(path_project, "processed-data", "3.1-cco-data-utci.fst"))

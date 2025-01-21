@@ -1,15 +1,13 @@
 # Load Libraries ----
 rm(list = ls())
-pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here, survival)
+pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, here, survival)
 pacman::p_load(doParallel)
+
+# set paths ----
 source("paths-mac.R")
 
-# Constants ----
-path_processed <- here(path_project, "processed-data")
-
 # Read Data ----
-df_cco_tmax <- read_fst(here(path_processed, "3.1-cco-data-utci.fst"), as.data.table = TRUE)
-
+df_cco_tmax <- read_fst(here(path_project, "processed-data", "3.1-cco-data-utci.fst"), as.data.table = TRUE)
 
 # List of exposure variables ----
 colnames(df_cco_tmax)
@@ -44,10 +42,9 @@ names(models_first_set) <- varlist_exp_all
 all_model_outputs <- models_first_set
 
 # Save the list as an RDS object
-saveRDS(all_model_outputs, here(path_processed, "4.1-models-cco-utci.rds"))
+saveRDS(all_model_outputs, here(path_project, "processed-data", "4.1-models-cco-utci_21.rds"))
 print("Finished saving all models")
 print(Sys.time())
-
 
 # Example of one model
 # library(survival)

@@ -3,47 +3,52 @@
 # Step-2: creates and saves a subset of calls data that have only DV related cases. 
 # Step-3: It also creates a list of unique call types and saves it as an xlsx file.
 
-# Load Libraries
-pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, here)
-# drive_auth()
-pacman::p_load(dplyr, janitor, data.table, fst, openxlsx, here, googledrive)
+# load Libraries
+pacman::p_load(dplyr, janitor, data.table, fst, openxlsx, here)
 
-# Step-1: Read and Process NOPD DV calls data
+# step-1: read and process NOPD DV calls data
 ## Point to the path where the NOPD calls are stored
 path_grive_temp_nopd <- here(path_project, "raw-data", "nopd-calls-csvs")
-## List all CSV files in the directory
+
+## list all CSV files in the directory
 file_list <- list.files(path_grive_temp_nopd, pattern = "\\.csv$")
 
-## Specify the columns you want to read by name or index
+## specify the columns you want to read by name or index
 cols_to_read <- c("NOPD_Item", "Type_", "TypeText", "Priority", 
                     "TimeCreate", "BLOCK_ADDRESS", "Zip",
                     "Location") # replace with your column names or indices
 
-## Initialize an empty list to store data frames
+## initialize an empty list to store data frames
 data_list <- list()
 
-## Loop through the files and read the specified columns
+## loop through the files and read the specified columns
 for (file in file_list) {
   full_path <- here(path_grive_temp_nopd, file)  # Create the full path to the file
   df <- fread(full_path, select = cols_to_read)  # Read the file
   data_list[[file]] <- df  # Store the data frame in the list
 }
 
-## Combine all data frames into a single data frame
+## combine all data frames into a single data frame
 combined_df <- do.call(rbind, data_list)
 
-## Create a unique ID using the row number
+## create a unique ID using the row number
 combined_df <- combined_df %>% 
     dplyr::mutate(uid = row_number()) |>
     dplyr::select(uid, everything())
 
-## Save work for Step-1
-path_processed_data <- here(path_project, "processed-data")
-write_fst(combined_df, here(path_processed_data, "1.1a-nopd-calls-raw-all.fst"))
+# create variable for date, month, and year ----
+combined_df <- combined_df |>
+                  mutate(date = as.Date(TimeCreate, format = "%m/%d/%Y")) |>
+                  mutate(year = lubridate::year(date)) |>
+                  mutate(month = lubridate::month(date)) 
 
-df_all <- read_fst(here(path_processed_data, "1.1a-nopd-calls-raw-all-cases.fst"))
+## save work for Step-1
+path_project, "processed-data" <- here(path_project, "processed-data")
+write_fst(combined_df, here(path_project, "processed-data", "1.1a-nopd-calls-raw-all.fst"))
 
-# Step-2: Subset data to retain DV cases only
+df_all <- read_fst(here(path_project, "processed-data", "1.1a-nopd-calls-raw-all-cases.fst"))
+
+# step-2: subset data to retain DV cases only
 ## List of call types that may be Domestic Violence related
 ## Based on this report: https://nopdnews.com/getattachment/Transparency/Policing-Data/Data/Domestic-Violence/2019-Domestic-Violence-Annual-Report.pdf/?lang=en-US
 ## Another resource shared by Melissa: https://nopdnews.com/transparency/policing-data/
@@ -52,21 +57,21 @@ list_call_type_DV <- c("AGGRAVATED ASSAULT DOMESTIC", "AGGRAVATED BATTERY DOMEST
                         "CRIMINAL DAMAGE DOMESTIC", "DOMESTIC DISTURBANCE", "DOMESTIC VIOLENCE", "EXTORTION (THREATS) DOMESTIC", 
                         "SIMPLE ASSAULT DOMESTIC",  "SIMPLE BATTERY DOMESTIC", "SIMPLE BURGLARY DOMESTIC")
 
-## Create a new column to identify cases that may be Domestic Violence related -----
+## create a new column to identify cases that may be Domestic Violence related -----
 df_nopd_full <- combined_df |> mutate(DV_related = ifelse(TypeText %in% list_call_type_DV, 1, 0)) 
 nrow(df_nopd_full)
 df_nopd_dv_cases <- df_nopd_full |> filter(DV_related == 1)
 nrow(df_nopd_dv_cases)
 
-## Save work for step-2
-write_fst(df_nopd_full, here(path_processed_data, "1.1a-nopd-calls-raw-all-cases.fst"))
-write_fst(df_nopd_dv_cases, here(path_processed_data, "1.1b-nopd-calls-raw-dv-only.fst"))
+## save work for step-2
+write_fst(df_nopd_full, here(path_project, "processed-data", "1.1a-nopd-calls-raw-all-cases.fst"))
+write_fst(df_nopd_dv_cases, here(path_project, "processed-data", "1.1b-nopd-calls-raw-dv-only.fst"))
 
-# Step-3: Create a unique list of TypeText
+# step-3: create a unique list of TypeText
 type_text <- sort(unique(combined_df$TypeText))
 type_text <- as.data.frame(type_text)
 nrow(type_text)
 ## Save outputs
-write.xlsx(type_text, here(path_processed_data, "1.1-nopd-call-type-categories.xlsx"), 
+write.xlsx(type_text, here(path_project, "processed-data", "1.1-nopd-call-type-categories.xlsx"), 
   sheetName = "call_type_categories")
 

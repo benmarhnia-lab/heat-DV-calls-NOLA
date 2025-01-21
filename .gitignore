@@ -1,4 +1,41 @@
-data/
-outputs/
-dummy*.R
+# vscode 
+.vscode
 
+# conda
+.conda
+
+# History files
+.Rhistory
+.Rapp.history
+
+# Session Data files
+.RData
+.RDataTmp
+
+# User-specific files
+.Ruserdata
+
+# RStudio files
+*.Rproj
+.Rproj.user/
+
+# MacOS files
+*.DS_Store
+
+# R Environment Variables and profile
+.Renviron
+.Rprofile
+.Rproj.user
+
+# Path and dummy files
+dummy*.R
+paths*.R
+
+# lint files
+.lintr
+
+# MacOS files
+*.DS_Store 
+
+# Archive files
+src-archive/

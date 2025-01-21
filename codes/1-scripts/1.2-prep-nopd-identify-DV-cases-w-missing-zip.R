@@ -8,14 +8,14 @@ rm(list = ls())
 source("paths-mac.R")
 
 # Read raw-dv data
-path_processed_data <- here(path_project, "processed-data")
-df_nopd_dv_cases <- read_fst(here(path_processed_data, "1.1b-nopd-calls-raw-dv-only.fst"), as.data.table = TRUE)
+path_project, "processed-data" <- here(path_project, "processed-data")
+df_nopd_dv_cases <- read_fst(here(path_project, "processed-data", "1.1b-nopd-calls-raw-dv-only.fst"), as.data.table = TRUE)
 nrow(df_nopd_dv_cases) # 167,042 cases
 
 # Subset of data where zip code is missing
 # unique(df_nopd_comb$Zip)
 df_missing_zip <- df_nopd_dv_cases |>
-    filter(is.na(Zip) | Zip == "None" | Zip == "") 
+    filter(is.na(Zip) | Zip == "None" | Zip == "")
 
 df_missing_zip <- df_missing_zip[, .(uid, Zip, BLOCK_ADDRESS, Location)]
 
@@ -35,5 +35,5 @@ nrow(df_missing_zip_and_block) # There is no such case!
 
 # Save files
 ## Export missing Zip files to an excel for Namratha and Edwin to fill in
-write.csv(df_missing_zip, here(path_processed_data, "1.2-missing-zips.csv"), row.names = FALSE)
+write.csv(df_missing_zip, here(path_project, "processed-data", "1.2-missing-zips.csv"), row.names = FALSE)
 

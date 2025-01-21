@@ -1,19 +1,19 @@
 # Libraries ----
 rm(list = ls())
-pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, googledrive, here)
+pacman::p_load(tidyverse, data.table, janitor, fst, beepr, openxlsx, lme4, broom, broom.mixed, here)
 pacman::p_load(parallel, doParallel, foreach)
 library(climExposuR)
 source("paths-mac.R")
 
 # Constants ----
-path_processed_data <- here(path_project, "processed-data")
+path_project, "processed-data" <- here(path_project, "processed-data")
 
 heat_var <- "utci_mean"
 vec_cutoffs_abs <- c(28, 30, 32)
 vec_duration <- c(2, 3, 4, 5)
 
 # Read data ----
-df_temp_data_nola <- read_fst(here(path_processed_data, "2.2_nola_utci_zip_cutoffs_added.fst"), as.data.table = TRUE)
+df_temp_data_nola <- read_fst(here(path_project, "processed-data", "2.2_nola_utci_zip_cutoffs_added.fst"), as.data.table = TRUE)
 head(df_temp_data_nola)
 sum(is.na(df_temp_data_nola$wbgt_max))
 # min(df_temp_data_nola$date)
@@ -130,5 +130,5 @@ df_temp_data_nola |> select(starts_with("abs_hd")) |> summary()
 df_temp_data_nola |> select(starts_with("rel_hw")) |> summary()
 
 # Save Work
-write_fst(df_temp_data_nola, path = here(path_processed_data, "2.3-clim-vars-utci.fst"))
+write_fst(df_temp_data_nola, path = here(path_project, "processed-data", "2.3-clim-vars-utci.fst"))
 
