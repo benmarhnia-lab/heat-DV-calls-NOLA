@@ -49,11 +49,9 @@ nrow(df_nopd_dv_cases_all)
 nrow(df_complete_zip)
 nrow(df_missing_zip_new)
 
-# filter to retain cases before 2021 ----
-max(df_nopd_dv_cases_full$date)
-df_nopd_dv_cases_full <- df_nopd_dv_cases_full |> filter(date < "2022-01-01") |> filter(year != "23")
 
 ## save the data ----
 df_nopd_dv_cases_full |> write_fst(here(path_project, "processed-data", "1.3-nopd-calls-raw-dv-only-completed.fst"))
-# df_nopd_dv_cases_full <- read_fst(here(path_project, "processed-data", "1.3-nopd-calls-raw-dv-only-completed.fst"))
+df_nopd_dv_cases_full <- read_fst(here(path_project, "processed-data", "1.3-nopd-calls-raw-dv-only-completed.fst"))
+nrow(df_nopd_dv_cases_full)
 # head(df_nopd_dv_cases_full |> filter(year == "23"))

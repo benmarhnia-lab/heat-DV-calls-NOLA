@@ -10,7 +10,6 @@ source("paths-mac.R")
 model_outputs <- readRDS(here(path_project, "processed-data", "4.1-models-cco-utci_21.rds"))
 print("finished loading models")
 
-
 # Step-1: Extract Tidy Outputs  ----
 ## Initialize an empty list to store tidy outputs
 tidy_outputs <- list()
@@ -65,7 +64,7 @@ for(model_name in names(tidy_outputs)) {
 head(combined_exposures)
 
 ## Save Step-2  output to a CSV 
-write.csv(combined_exposures, here(path_project, "outputs", "models", "models_consolidated_cco_utci_21.csv"), row.names = FALSE)
+combined_exposures |> write.csv(here(path_project, "outputs", "models", "models_consolidated_cco_utci_21.csv"), row.names = FALSE)
 
 # step-3: calculate attributable fraction ----
 ## For 90th percentile heatwave for 5 days

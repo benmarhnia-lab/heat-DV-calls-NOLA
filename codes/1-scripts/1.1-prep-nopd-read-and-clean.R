@@ -42,11 +42,9 @@ combined_df <- combined_df |>
                   mutate(year = lubridate::year(date)) |>
                   mutate(month = lubridate::month(date)) 
 
-## save work for Step-1
-path_project, "processed-data" <- here(path_project, "processed-data")
-write_fst(combined_df, here(path_project, "processed-data", "1.1a-nopd-calls-raw-all.fst"))
+## filter year to 2021 and earlier
+combined_df <- combined_df |> filter(year != "2022" & year != "23")
 
-df_all <- read_fst(here(path_project, "processed-data", "1.1a-nopd-calls-raw-all-cases.fst"))
 
 # step-2: subset data to retain DV cases only
 ## List of call types that may be Domestic Violence related
@@ -60,12 +58,16 @@ list_call_type_DV <- c("AGGRAVATED ASSAULT DOMESTIC", "AGGRAVATED BATTERY DOMEST
 ## create a new column to identify cases that may be Domestic Violence related -----
 df_nopd_full <- combined_df |> mutate(DV_related = ifelse(TypeText %in% list_call_type_DV, 1, 0)) 
 nrow(df_nopd_full)
+
+## subset data to retain DV cases only
 df_nopd_dv_cases <- df_nopd_full |> filter(DV_related == 1)
 nrow(df_nopd_dv_cases)
+sum(is.na(df_nopd_dv_cases$Zip))
 
 ## save work for step-2
-write_fst(df_nopd_full, here(path_project, "processed-data", "1.1a-nopd-calls-raw-all-cases.fst"))
-write_fst(df_nopd_dv_cases, here(path_project, "processed-data", "1.1b-nopd-calls-raw-dv-only.fst"))
+df_nopd_full |> write_fst(here(path_project, "processed-data", "1.1a-nopd-calls-raw-all-cases.fst"))
+# df_nopd_full <- read_fst(here(path_project, "processed-data", "1.1a-nopd-calls-raw-all-cases.fst"))
+df_nopd_dv_cases |> write_fst(here(path_project, "processed-data", "1.1b-nopd-calls-raw-dv-only.fst"))
 
 # step-3: create a unique list of TypeText
 type_text <- sort(unique(combined_df$TypeText))

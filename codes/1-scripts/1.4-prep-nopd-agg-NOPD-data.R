@@ -32,8 +32,8 @@ df_dv_cases_agg <- df_dv_cases_agg[, ':=' (
                       weekday = lubridate::wday(date, label = TRUE),
                       case_date = date)][, date := NULL]
 
-nrow(df_dv_cases_agg) # 60083
-length(unique(df_dv_cases_agg$Zip)) # 29
+nrow(df_dv_cases_agg) # 52,447
+length(unique(df_dv_cases_agg$Zip)) # 27
 # View(head(df_dv_cases_agg))
 
 # Drop Zip codes with less than 50 cases ---
@@ -41,9 +41,14 @@ df_dv_cases_agg <- df_dv_cases_agg |>
   group_by(Zip) |>
   filter(n() >= 50) |>
   ungroup()
-nrow(df_dv_cases_agg) # 60028
+nrow(df_dv_cases_agg) # 52,399
 
 # Save file ----
 df_dv_cases_agg |> write_fst(here(path_project, "processed-data", "1.4-DV-cases-agg.fst"))
-# df_dv_cases_agg <- read_fst(here(path_project, "processed-data", "1.4-DV-cases-agg.fst"))
+df_dv_cases_agg <- read_fst(here(path_project, "processed-data", "1.4-DV-cases-agg.fst"))
+nrow(df_dv_cases_agg) # 60028
 # length(unique(df_dv_cases_agg$Zip)) # 17
+df_dv_cases_agg |>
+  group_by(Zip) |>
+  summarise(n = n()) |>
+  arrange(desc(n)) 
