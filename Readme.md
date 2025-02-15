@@ -33,27 +33,35 @@ These datasets correspond to the daily zip-code specific values of mean UTCI and
 
 ## 1. Data Preparation
 
-### [1.1-data-prep-long-term-cutoffs-utci.R](R/1.1-data-prep-long-term-cutoffs-utci.R)
+### [1.1-data-prep-long-term-cutoffs-utci.R](R/main/1.1-data-prep-long-term-cutoffs-utci.R)
 This script creates long-term cutoffs for the 90th percentile of UTCI for each zip code.
 
-### [1.2-data-prep-create-exposures-utci.R](R/1.2-data-prep-create-exposures-utci.R)
+### [1.2-data-prep-create-exposures-utci.R](R/main/1.2-data-prep-create-exposures-utci.R)
 This script creates exposure variables for extreme heat for each zip code.
 
-### [1.3-data-prep-days-exposed.R](R/1.3-data-prep-dats-exposed.R)
+### [1.3-data-prep-days-exposed.R](R/main/1.3-data-prep-dats-exposed.R)
 This script calculates the total number of cases and average number of domestic violence related calls for each exposure variable.
 
-### [1.4-data-prep-DV-cco.R](R/1.4-data-prep-DV-cco.R)
+### [1.4-data-prep-DV-cco.R](R/main/1.4-data-prep-DV-cco.R)
 This script prepares the data for the case crossover analysis.
 
 ## 2. Models and outputs 
 
-### [2.1-models-run-cco-utci.R](R/2.1-models-run-cco-utci.R)
+### [2.1-models-run-cco-utci.R](R/main/2.1-models-run-cco-utci.R)
 This script runs the models for the case crossover analysis.
 
-### [2.2-models-extract-coefs.R](R/2.2-models-extract-coefs.R)
+### [2.2-models-extract-coefs.R](R/main/2.2-models-extract-coefs.R)
 This script extracts the coefficients from the models for the case crossover analysis.
 
-### [2.3-models-attributable-fraction.R](R/2.3-models-attributable-fraction.R)
+### [2.3-models-attributable-fraction.R](R/main/2.3-models-attributable-fraction.R)
 This script generates the attributable fraction and attributable numbers for the case crossover analysis.
+
+## 3. Supporting functions
+
+### [func-flexi-cutoffs.R](R/functions/func-flexi-cutoffs.R)
+This R function calculates percentile-based cutoff values for time series data across different geographic units like ZIP codes. It offers three calculation methods: crude (using all historical data), rolling (using a specified window of days), or day-of-year specific, and performs these calculations in parallel for improved performance. The function returns a data table containing the calculated percentile cutoffs for each date and geographic unit combination, making it useful for analyzing temporal patterns in environmental or health data.
+
+### [func-gen-MC-CIs.R](R/functions/func-gen-MC-CIs.R)
+This function calculates point estimates and confidence intervals for attributable fractions (AF) and attributable numbers (AN) using Monte Carlo simulation from a list of fitted models and total case counts.
 
 Note: This repository is part of ongoing research at Scripps Institution of Oceanography, UC San Diego. Additional scripts and documentation will be added as the analysis progresses.

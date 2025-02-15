@@ -1,3 +1,41 @@
+#' Calculate Attributable Fractions and Numbers with Confidence Intervals
+#' 
+#' @description
+#' This function calculates point estimates and confidence intervals for attributable
+#' fractions (AF) and attributable numbers (AN) using Monte Carlo simulation from
+#' a list of fitted models and total case counts.
+#'
+#' @param models_list A named list of fitted regression models
+#' @param df_total_cases A data frame containing total case counts with columns:
+#'   \itemize{
+#'     \item variable - Names matching the models in models_list
+#'     \item total_cases - Total number of cases for each exposure
+#'   }
+#' @param n_iterations Number of Monte Carlo iterations (default: 1000)
+#' @param conf_level Confidence level for intervals (default: 0.95)
+#'
+#' @return A data frame with rows for each exposure and columns:
+#'   \itemize{
+#'     \item exposure - Name of the exposure variable
+#'     \item total_cases - Total cases for that exposure
+#'     \item af_point - Point estimate of attributable fraction (%)
+#'     \item af_lower - Lower confidence bound for AF (%)
+#'     \item af_upper - Upper confidence bound for AF (%)
+#'     \item an_point - Point estimate of attributable number
+#'     \item an_lower - Lower confidence bound for AN
+#'     \item an_upper - Upper confidence bound for AN
+#'   }
+#'
+#' @details
+#' The function uses Monte Carlo simulation to generate confidence intervals by:
+#' 1. Sampling from the distribution of log odds ratios
+#' 2. Converting to attributable fractions
+#' 3. Calculating attributable numbers using total case counts
+#' 4. Computing quantiles for confidence intervals
+#'
+#' @importFrom stats quantile rnorm
+#' @importFrom utils setTxtProgressBar txtProgressBar
+
 generate_af_an_ci <- function(models_list, df_total_cases, n_iterations = 1000, conf_level = 0.95) {
     results_list <- list()
     

@@ -20,7 +20,7 @@
 .Rproj.user/
 
 # MacOS files
-*.DS_Store
+.DS_Store
 
 # R Environment Variables and profile
 .Renviron
