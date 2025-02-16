@@ -1,5 +1,5 @@
 #' Calculate Attributable Fractions and Numbers with Confidence Intervals
-#' 
+#' @author Arnab K. Dey
 #' @description
 #' This function calculates point estimates and confidence intervals for attributable
 #' fractions (AF) and attributable numbers (AN) using Monte Carlo simulation from

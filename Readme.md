@@ -31,7 +31,7 @@ These datasets correspond to the daily zip-code specific values of mean UTCI and
 
 # Data Analysis Scripts
 
-## 1. Data Preparation
+## 1. Data preparation
 
 ### [1.1-data-prep-long-term-cutoffs-utci.R](R/main/1.1-data-prep-long-term-cutoffs-utci.R)
 This script creates long-term cutoffs for the 90th percentile of UTCI for each zip code.
@@ -61,7 +61,7 @@ This script generates the attributable fraction and attributable numbers for the
 ### [func-flexi-cutoffs.R](R/functions/func-flexi-cutoffs.R)
 This R function calculates percentile-based cutoff values for time series data across different geographic units like ZIP codes. It offers three calculation methods: crude (using all historical data), rolling (using a specified window of days), or day-of-year specific, and performs these calculations in parallel for improved performance. The function returns a data table containing the calculated percentile cutoffs for each date and geographic unit combination, making it useful for analyzing temporal patterns in environmental or health data.
 
-### [func-gen-MC-CIs.R](R/functions/func-gen-MC-CIs.R)
+### [func-gen-MC-CIs-AF-AN.R](R/functions/func-gen-MC-CIs-AF-AN.R)
 This function calculates point estimates and confidence intervals for attributable fractions (AF) and attributable numbers (AN) using Monte Carlo simulation from a list of fitted models and total case counts.
 
 Note: This repository is part of ongoing research at Scripps Institution of Oceanography, UC San Diego. Additional scripts and documentation will be added as the analysis progresses.

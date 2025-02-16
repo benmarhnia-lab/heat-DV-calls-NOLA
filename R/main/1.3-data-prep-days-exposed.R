@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------------
 # @project: Extreme heat and domestic violenve related service calls in New Orleans
-# @author: Arnab K. Dey (arnabxdey@gmail.com)
+# @author: Arnab K. Dey 
 # @organization: Scripps Institution of Oceanography, UC San Diego
 # @description: This script calculates the total number of cases for each exposure variable
 # @date: Feb 4, 2025
